@@ -31,7 +31,7 @@ public class JsonDiffApplication implements CommandLineRunner {
 
         if (args == null || args.length == 0) {
             // RESOURCES mode (IntelliJ)
-            String aName = "SG.json";   // ensure these exist in src/main/resources
+            String aName = "SG.json";
             String bName = "IPB.json";
 
             System.out.printf("Running in RESOURCES mode (IntelliJ). A=%s, B=%s%n", aName, bName);
@@ -39,20 +39,19 @@ public class JsonDiffApplication implements CommandLineRunner {
             JsonNode left = readJsonFromResources(aName);
             JsonNode right = readJsonFromResources(bName);
 
-            List<DiffEntry> diffs = diffService.diff(left, right);
+            // 🔸 Feature-level diff
+            List<DiffEntry> diffs = diffService.diffFeatures(left, right);
 
-            // Console text report
             String report = reporter.format(diffs, aName, bName);
             System.out.println(report);
 
-            // CSV report
             String csv = reporter.formatCsv(diffs, aName, bName);
             String csvPath = "json-diff-report.csv";
             reporter.writeCsv(csv, csvPath);
             System.out.printf("CSV written to %s%n", csvPath);
 
         } else {
-            // FILE mode (JAR): <A.json> <B.json> [output.txt]
+            // FILE mode (JAR)
             if (args.length < 2 || args.length > 3) {
                 printUsage();
                 return;
@@ -70,26 +69,21 @@ public class JsonDiffApplication implements CommandLineRunner {
             JsonNode left = objectMapper.readTree(Path.of(srcA).toFile());
             JsonNode right = objectMapper.readTree(Path.of(srcB).toFile());
 
-            List<DiffEntry> diffs = diffService.diff(left, right);
+            // 🔸 Feature-level diff
+            List<DiffEntry> diffs = diffService.diffFeatures(left, right);
 
-            // Console or file text report
             String report = reporter.format(diffs, aLabel, bLabel);
 
             if (outputPath == null) {
                 System.out.println(report);
-
-                // Still write a CSV next to console output
                 String csv = reporter.formatCsv(diffs, aLabel, bLabel);
                 String csvPath = "json-diff-report.csv";
                 reporter.writeCsv(csv, csvPath);
                 System.out.printf("CSV written to %s%n", csvPath);
-
             } else {
-                // Write text report to the provided path
                 reporter.writeToFile(report, outputPath);
                 System.out.printf("Report written to %s%n", outputPath);
 
-                // Write CSV alongside the text report (same base name)
                 String csv = reporter.formatCsv(diffs, aLabel, bLabel);
                 String csvPath = deriveCsvPath(outputPath);
                 reporter.writeCsv(csv, csvPath);
@@ -118,7 +112,6 @@ public class JsonDiffApplication implements CommandLineRunner {
         }
     }
 
-    /** Derive CSV path from a text output path (e.g., diff-report.txt -> diff-report.csv) */
     private String deriveCsvPath(String outputPath) {
         int dot = outputPath.lastIndexOf('.');
         if (dot > 0) {

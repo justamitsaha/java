@@ -4,7 +4,6 @@ package com.example.jsondiff.service;
 import com.example.jsondiff.model.DiffEntry;
 import com.example.jsondiff.model.DiffType;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 
 import java.util.*;
@@ -13,122 +12,63 @@ import java.util.stream.StreamSupport;
 
 public class JsonDiffService {
 
-    public List<DiffEntry> diff(JsonNode left, JsonNode right) {
+    /**
+     * Feature-level diff:
+     * - Missing: feature present only in one side -> ADDED/REMOVED
+     * - Modified: feature present in both but objects differ -> CHANGED
+     * Emits ONE DiffEntry per feature (path = "Feature.<name>") with whole feature objects
+     * as leftValue/rightValue.
+     */
+    public List<DiffEntry> diffFeatures(JsonNode leftRoot, JsonNode rightRoot) {
         List<DiffEntry> diffs = new ArrayList<>();
-        compareNodes(left, right, "", diffs);
-        diffs.sort(Comparator.comparing(DiffEntry::getPath).thenComparing(e -> e.getType().name()));
+        if (leftRoot == null && rightRoot == null) return diffs;
+
+        JsonNode leftFeatureObj = (leftRoot != null) ? leftRoot.get("Feature") : null;
+        JsonNode rightFeatureObj = (rightRoot != null) ? rightRoot.get("Feature") : null;
+
+        // If both sides don't have "Feature" object, nothing to compare
+        if ((leftFeatureObj == null || !leftFeatureObj.isObject())
+                && (rightFeatureObj == null || !rightFeatureObj.isObject())) {
+            return diffs;
+        }
+
+        Set<String> featureNames = new TreeSet<>();
+        if (leftFeatureObj != null && leftFeatureObj.isObject()) {
+            leftFeatureObj.fieldNames().forEachRemaining(featureNames::add);
+        }
+        if (rightFeatureObj != null && rightFeatureObj.isObject()) {
+            rightFeatureObj.fieldNames().forEachRemaining(featureNames::add);
+        }
+
+        for (String name : featureNames) {
+            JsonNode l = (leftFeatureObj != null) ? leftFeatureObj.get(name) : null;
+            JsonNode r = (rightFeatureObj != null) ? rightFeatureObj.get(name) : null;
+            String path = "Feature." + name;
+
+            if (l == null && r != null) {
+                // Present only in right -> Missing in A
+                diffs.add(new DiffEntry(DiffType.ADDED, path, null, toPrintable(r), null));
+            } else if (l != null && r == null) {
+                // Present only in left -> Missing in B
+                diffs.add(new DiffEntry(DiffType.REMOVED, path, toPrintable(l), null, null));
+            } else if (l != null && r != null && !deepEquals(l, r)) {
+                // Present in both, but structure/value differs -> Modified
+                diffs.add(new DiffEntry(DiffType.CHANGED, path, toPrintable(l), toPrintable(r), null));
+            }
+            // If equal, no entry
+        }
+
+        // Sort by path then type for stable report
+        diffs.sort(Comparator.comparing(DiffEntry::getPath)
+                .thenComparing(e -> e.getType().name()));
         return diffs;
     }
 
-    private void compareNodes(JsonNode left, JsonNode right, String path, List<DiffEntry> diffs) {
-        if (left == null && right == null) return;
+    // --- Helpers (kept from previous service) ---
 
-        // Handle missing sides
-        if (left == null) {
-            diffs.add(new DiffEntry(DiffType.ADDED, pathOrRoot(path), null, toPrintable(right), null));
-            return;
-        }
-        if (right == null) {
-            diffs.add(new DiffEntry(DiffType.REMOVED, pathOrRoot(path), toPrintable(left), null, null));
-            return;
-        }
-
-        // Value nodes
-        if (left.isValueNode() && right.isValueNode()) {
-            if (!Objects.equals(normalizeValueNode(left), normalizeValueNode(right))) {
-                diffs.add(new DiffEntry(
-                        DiffType.CHANGED, pathOrRoot(path),
-                        toPrintable(left), toPrintable(right), null
-                ));
-            }
-            return;
-        }
-
-        // Object nodes
-        if (left.isObject() && right.isObject()) {
-            Set<String> fieldNames = new TreeSet<>();
-            left.fieldNames().forEachRemaining(fieldNames::add);
-            right.fieldNames().forEachRemaining(fieldNames::add);
-            for (String field : fieldNames) {
-                String childPath = appendPath(path, field);
-                JsonNode lChild = left.get(field);
-                JsonNode rChild = right.get(field);
-                if (lChild == null && rChild != null) {
-                    diffs.add(new DiffEntry(DiffType.ADDED, childPath, null, toPrintable(rChild), null));
-                } else if (lChild != null && rChild == null) {
-                    diffs.add(new DiffEntry(DiffType.REMOVED, childPath, toPrintable(lChild), null, null));
-                } else {
-                    compareNodes(lChild, rChild, childPath, diffs);
-                }
-            }
-            return;
-        }
-
-        // Array nodes
-        if (left.isArray() && right.isArray()) {
-            compareArrays((ArrayNode) left, (ArrayNode) right, path, diffs);
-            return;
-        }
-
-        // Different node types -> changed
-        diffs.add(new DiffEntry(DiffType.CHANGED, pathOrRoot(path), toPrintable(left), toPrintable(right),
-                "Different JSON node types"));
-    }
-
-
-    private void compareArrays(ArrayNode left, ArrayNode right, String path, List<DiffEntry> diffs) {
-        boolean allScalars = isAllScalars(left) && isAllScalars(right);
-
-        if (allScalars) {
-            // SET comparison: show ADDED/REMOVED items ignoring order and duplicates
-            Set<String> leftSet = toScalarSet(left);
-            Set<String> rightSet = toScalarSet(right);
-
-            Set<String> added = new TreeSet<>(rightSet);
-            added.removeAll(leftSet);
-
-            Set<String> removed = new TreeSet<>(leftSet);
-            removed.removeAll(rightSet);
-
-            if (!added.isEmpty()) {
-                diffs.add(new DiffEntry(DiffType.ADDED, pathOrRoot(path),
-                        null, null, "Array items added: " + added));
-            }
-            if (!removed.isEmpty()) {
-                diffs.add(new DiffEntry(DiffType.REMOVED, pathOrRoot(path),
-                        null, null, "Array items removed: " + removed));
-            }
-
-            // 👉 Add a consolidated 'Modified' row for side-by-side output (console & CSV)
-            if (!added.isEmpty() || !removed.isEmpty()) {
-                String leftSetStr = leftSet.toString();   // e.g., [SEG1, SEG2, SEG3]
-                String rightSetStr = rightSet.toString(); // e.g., [SEG1, SEG4]
-                diffs.add(new DiffEntry(DiffType.CHANGED, pathOrRoot(path), leftSetStr, rightSetStr, null));
-            }
-
-            // If lengths differ but sets same, no change reported (order-insensitive).
-        } else {
-            // INDEX comparison: show per-index changes (order-sensitive)
-            int max = Math.max(left.size(), right.size());
-            for (int i = 0; i < max; i++) {
-                String idxPath = path + "[" + i + "]";
-                JsonNode l = i < left.size() ? left.get(i) : null;
-                JsonNode r = i < right.size() ? right.get(i) : null;
-                compareNodes(l, r, idxPath, diffs);
-            }
-        }
-    }
-
-    private boolean isAllScalars(ArrayNode array) {
-        return StreamSupport.stream(array.spliterator(), false)
-                .allMatch(JsonNode::isValueNode);
-    }
-
-    private Set<String> toScalarSet(ArrayNode array) {
-        return StreamSupport.stream(array.spliterator(), false)
-                .map(this::normalizeValueNode)
-                .map(Objects::toString)
-                .collect(Collectors.toCollection(TreeSet::new));
+    /** Deep equality using JsonNode.equals for structural and value equality. */
+    private boolean deepEquals(JsonNode a, JsonNode b) {
+        return Objects.equals(a, b);
     }
 
     private Object normalizeValueNode(JsonNode node) {
@@ -140,18 +80,12 @@ public class JsonDiffService {
         return vn.toString();
     }
 
+    /** Pretty prints objects; value nodes are stringified as scalars. */
     private String toPrintable(JsonNode node) {
         if (node == null || node.isNull()) return "null";
         if (node.isValueNode()) return String.valueOf(normalizeValueNode(node));
         return node.toPrettyString();
     }
 
-    private String appendPath(String base, String field) {
-        if (base == null || base.isEmpty()) return field;
-        return base + "." + field;
-    }
-
-    private String pathOrRoot(String path) {
-        return (path == null || path.isEmpty()) ? "$" : path;
-    }
+    // If you keep the old fine-grained diff, that's fine; the app will call diffFeatures().
 }
