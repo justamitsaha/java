@@ -1,16 +1,64 @@
-
 {
   "Feature": {
-    "feature1": { "status": "OFF" },
-    "feature2": { "status": "ON" },
-    "feature3": { "status": "OFF" },
-    "feature5": { "status": "ON" },
-    "feature6": { "status": "OVERRIDE", "override": { "staff": false } },
-    "feature7": { "status": "OVERRIDE", "override": { "segments": ["SEG1", "SEG4"] } },
-    "feature8": { "status": "OVERRIDE", "override": { "staff": false } },
-    "feature9": { "status": "OVERRIDE", "override": { "segments": ["SEG1", "SEG4"] } },
-    "feature10": { "status": "OVERRIDE", "override": { "staff": false } },
-    "feature11": { "status": "OVERRIDE", "override": { "segments": ["SEG1", "SEG4"] } },
-    "feature12": { "status": "ON" }
+    "feature1": {
+      "status": "OFF"
+    },
+    "feature2": {
+      "status": "ON"
+    },
+    "feature3": {
+      "status": "OFF"
+    },
+    "feature5": {
+      "status": "ON"
+    },
+    "feature6": {
+      "status": "OVERRIDE",
+      "override": {
+        "staff": false
+      }
+    },
+    "feature7": {
+      "status": "OVERRIDE",
+      "override": {
+        "segments": [
+          "SEG1",
+          "SEG4"
+        ]
+      }
+    },
+    "feature8": {
+      "status": "OVERRIDE",
+      "override": {
+        "staff": false
+      }
+    },
+    "feature9": {
+      "status": "OVERRIDE",
+      "override": {
+        "segments": [
+          "SEG1",
+          "SEG4"
+        ]
+      }
+    },
+    "feature10": {
+      "status": "OVERRIDE",
+      "override": {
+        "staff": false
+      }
+    },
+    "feature11": {
+      "status": "OVERRIDE",
+      "override": {
+        "segments": [
+          "SEG1",
+          "SEG4"
+        ]
+      }
+    },
+    "feature12": {
+      "status": "ON"
+    }
   }
 }

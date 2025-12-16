@@ -25,13 +25,15 @@ public class JsonDiffApplication implements CommandLineRunner {
         SpringApplication.run(JsonDiffApplication.class, args);
     }
 
+
+    // JsonDiffApplication.java (only show changed parts)
     @Override
     public void run(String... args) throws Exception {
         Reporter reporter = new Reporter();
 
         if (args == null || args.length == 0) {
-            // IntelliJ / IDE mode — load from classpath resources
-            String aName = "SG.json"; // you can rename to featuresA.json if you prefer
+            // RESOURCES mode
+            String aName = "SG.json"; // rename to your preferred resource names
             String bName = "IPB.json";
 
             System.out.printf("Running in RESOURCES mode (IntelliJ). A=%s, B=%s%n", aName, bName);
@@ -39,11 +41,12 @@ public class JsonDiffApplication implements CommandLineRunner {
             JsonNode right = readJsonFromResources(bName);
 
             List<DiffEntry> diffs = diffService.diff(left, right);
-            String report = reporter.format(diffs);
+            String report = reporter.format(diffs, aName, bName);
+
             System.out.println(report);
 
         } else {
-            // JAR CLI mode — use file arguments: <A.json> <B.json> [output.txt]
+            // FILE mode
             if (args.length < 2 || args.length > 3) {
                 printUsage();
                 return;
@@ -53,18 +56,22 @@ public class JsonDiffApplication implements CommandLineRunner {
             String srcB = args[1];
             String outputPath = (args.length == 3) ? args[2] : null;
 
+            String aLabel = Path.of(srcA).getFileName().toString();
+            String bLabel = Path.of(srcB).getFileName().toString();
+
             System.out.printf("Running in FILE mode (JAR). A=%s, B=%s%n", srcA, srcB);
 
             JsonNode left = objectMapper.readTree(Path.of(srcA).toFile());
             JsonNode right = objectMapper.readTree(Path.of(srcB).toFile());
 
             List<DiffEntry> diffs = diffService.diff(left, right);
-            String report = reporter.format(diffs);
+            String report = reporter.format(diffs, aLabel, bLabel);
 
             if (outputPath == null) {
                 System.out.println(report);
             } else {
                 reporter.writeToFile(report, outputPath);
+                //System.out.printf("Report            System.out.printf("Report written to %s%n", outputPath);
                 System.out.printf("Report written to %s%n", outputPath);
             }
         }
