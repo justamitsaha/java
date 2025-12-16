@@ -104,14 +104,24 @@ public class Reporter {
         return sb.toString();
     }
 
+
+
     /**
-     * CSV output: Category, Path, Feature, A_File, B_File, A_Value, B_Value, Details
-     * Values are safely quoted and inner quotes are escaped. Multiline JSON is preserved inside quotes.
+     * CSV output: Category, Path, Feature, <A_FileName>, <B_FileName>, Details
+     * - The two value columns are named with the actual file labels (e.g., SG.json, IPB.json).
+     * - Values are side-by-side for easy comparison.
+     * - Multiline JSON values are quoted and inner quotes escaped.
      */
     public String formatCsv(List<DiffEntry> diffs, String aLabel, String bLabel) {
         StringBuilder sb = new StringBuilder();
-        // Header
-        sb.append("Category,Path,Feature,A_File,B_File,A_Value,B_Value,Details\n");
+
+        // Dynamic header with file names as columns
+        sb.append(csv("Category")).append(',')
+                .append(csv("Path")).append(',')
+                .append(csv("Feature")).append(',')
+                .append(csv(aLabel)).append(',')
+                .append(csv(bLabel)).append(',')
+                .append(csv("Details")).append('\n');
 
         for (DiffEntry d : diffs) {
             String category = (d.getType() == DiffType.CHANGED) ? "Modified" : "Missing";
@@ -123,32 +133,37 @@ public class Reporter {
             String details = emptyIfNull(d.getDetails());
 
             if (d.getType() == DiffType.CHANGED) {
+                // Exists on both sides but values differ
                 aValue = emptyIfNull(d.getLeftValue());
                 bValue = emptyIfNull(d.getRightValue());
             } else if (d.getType() == DiffType.REMOVED) {
-                // present only in A, missing in B
+                // Present only in A, missing in B
                 aValue = emptyIfNull(d.getLeftValue());
                 bValue = "";
             } else if (d.getType() == DiffType.ADDED) {
-                // present only in B, missing in A
+                // Present only in B, missing in A
                 aValue = "";
                 bValue = emptyIfNull(d.getRightValue());
             }
 
-            // Row
             sb.append(csv(category)).append(',')
                     .append(csv(path)).append(',')
                     .append(csv(feature)).append(',')
-                    .append(csv(aLabel)).append(',')
-                    .append(csv(bLabel)).append(',')
                     .append(csv(aValue)).append(',')
                     .append(csv(bValue)).append(',')
-                    .append(csv(details))
-                    .append('\n');
+                    .append(csv(details)).append('\n');
         }
 
         return sb.toString();
     }
+
+    /** CSV-safe quoting: wrap in quotes and escape inner quotes by doubling them. */
+    private String csv(String s) {
+        if (s == null) return "\"\"";
+        String escaped = s.replace("\"", "\"\"");
+        return "\"" + escaped + "\"";
+    }
+
 
     public void writeToFile(String content, String outputPath) {
         try {
@@ -207,28 +222,30 @@ public class Reporter {
         return (s == null) ? "" : s;
     }
 
-    /** CSV-safe quoting: wrap in quotes and escape inner quotes by doubling them. */
-    private String csv(String s) {
-        if (s == null) return "\"\"";
-        String escaped = s.replace("\"", "\"\"");
-        return "\"" + escaped + "\"";
-    }
+//    /** CSV-safe quoting: wrap in quotes and escape inner quotes by doubling them. */
+//    private String csv(String s) {
+//        if (s == null) return "\"\"";
+//        String escaped = s.replace("\"", "\"\"");
+//        return "\"" + escaped + "\"";
+//    }
 }
 
 /*
-    "feature12": {
+There is only one issue now for e.g. for feature8, feature9 its showing as
+Modified	Feature.feature8.status	feature8	OFF	OVERRIDE
+Modified	Feature.feature9.status	feature9	ON	OVERRIDE
+Instead of OVERRIDE it should show for feature9
       "status": "OVERRIDE",
       "override": {
-        "staff": true
+        "segments": [
+          "SEG1",
+          "SEG4"
+        ]
       }
-    },
 
-        "feature12": {
-      "status": "ON"
-    }
-
-    Missing	Feature.feature14	feature14	SG.json	IPB.json	"{
-  ""status"" : ""ON""
-}"
-
+ And for feature 8
+       "status": "OVERRIDE",
+      "override": {
+        "staff": false
+      }
  */
