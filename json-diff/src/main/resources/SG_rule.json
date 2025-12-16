@@ -1,0 +1,25 @@
+{
+    "node1": [],
+    "node2": {
+        "child1": [
+            "abc",
+            "efg"
+        ],
+        "child2": [
+            "xzy",
+            "efg"
+        ]
+    },
+    "node4":{
+        "a":1,
+        "b":2
+    },
+    "node5":{
+        "key1": 5,
+        "key2": 8,
+        "key3": "ON"
+    }
+}
+
+
+
