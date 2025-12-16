@@ -1,0 +1,19 @@
+
+{
+  "Feature": {
+    "feature1": { "status": "OFF" },
+    "feature2": { "status": "ON" },
+    "feature3": { "status": "ON" },
+    "feature4": { "status": "ON" },
+    "feature6": { "status": "OVERRIDE", "override": { "staff": false } },
+    "feature7": { "status": "OVERRIDE", "override": { "segments": ["SEG1", "SEG4"] } },
+    "feature8": { "status": "OFF" },
+    "feature9": { "status": "ON" },
+    "feature10": { "status": "OVERRIDE", "override": { "staff": true } },
+    "feature11": { "status": "OVERRIDE", "override": { "segments": ["SEG1", "SEG5"] } },
+    "feature12": { "status": "OVERRIDE", "override": { "staff": true } },
+    "feature13": { "status": "OVERRIDE", "override": { "segments": ["SEG1", "SEG5"] } },
+    "feature14": { "status": "ON" }
+  }
+}
+

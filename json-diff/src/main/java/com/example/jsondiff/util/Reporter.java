@@ -62,3 +62,18 @@ public class Reporter {
         }
     }
 }
+
+/*
+Every thing is working now I just want the report to be different now , It should provide 2 categories
+1. Missing -> Should tell rule which is not present and in which file e.g
+```[Missing] Feature.feature4 | Missing in SG.json:
+  "status" : "ON"
+2. Modified -> Should tell when file is present but change in attribute e.g.
+```[Modified] Feature.feature11
+    SG.json Feature.feature11.override.segments contains SEG5
+    IPB.json Feature.feature11.override.segments contains SEG4
+```
+```
+
+3.
+ */
