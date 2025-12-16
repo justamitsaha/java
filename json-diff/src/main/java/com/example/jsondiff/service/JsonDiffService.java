@@ -75,6 +75,7 @@ public class JsonDiffService {
                 "Different JSON node types"));
     }
 
+
     private void compareArrays(ArrayNode left, ArrayNode right, String path, List<DiffEntry> diffs) {
         boolean allScalars = isAllScalars(left) && isAllScalars(right);
 
@@ -98,9 +99,16 @@ public class JsonDiffService {
                         null, null, "Array items removed: " + removed));
             }
 
+            // 👉 Add a consolidated 'Modified' row for side-by-side output (console & CSV)
+            if (!added.isEmpty() || !removed.isEmpty()) {
+                String leftSetStr = leftSet.toString();   // e.g., [SEG1, SEG2, SEG3]
+                String rightSetStr = rightSet.toString(); // e.g., [SEG1, SEG4]
+                diffs.add(new DiffEntry(DiffType.CHANGED, pathOrRoot(path), leftSetStr, rightSetStr, null));
+            }
+
             // If lengths differ but sets same, no change reported (order-insensitive).
         } else {
-            // INDEX comparison: show per-index changes
+            // INDEX comparison: show per-index changes (order-sensitive)
             int max = Math.max(left.size(), right.size());
             for (int i = 0; i < max; i++) {
                 String idxPath = path + "[" + i + "]";
