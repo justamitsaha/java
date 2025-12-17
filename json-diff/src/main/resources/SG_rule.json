@@ -1,24 +1,29 @@
 {
-    "node1": [],
-    "node2": {
-        "child1": [
-            "abc",
-            "efg"
-        ],
-        "child2": [
-            "xzy",
-            "efg"
-        ]
-    },
-    "node4":{
-        "a":1,
-        "b":2
-    },
-    "node5":{
-        "key1": 5,
-        "key2": 8,
-        "key3": "ON"
-    }
+  "node0": "efg",
+  "node1": [],
+  "node2": {
+    "child1": [
+      "abc",
+      "efg"
+    ],
+    "child2": [
+      "xzy",
+      "efg"
+    ]
+  },
+  "node3": {
+    "a": 1,
+    "b": 2
+  },
+  "node4": {
+    "key1": 5,
+    "key2": 8,
+    "key3": "ON"
+  },
+  "node6": {
+    "a": "A",
+    "b": "B"
+  }
 }
 
 

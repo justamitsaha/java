@@ -1,0 +1,19 @@
+"Category","Path","Feature","IPB_rule.json","SG_rule.json","Details"
+"Present","node0","node0","""efg""","""efg""",""
+"Modified","node1","node1","{ }","[ ]","Type mismatch"
+"Present","node2","node2","{}","{}",""
+"Present","node2.child1","node2","[]","[]",""
+"Modified","node2.child2","node2","[ ""abc"", ""efg"" ]","[ ""xzy"", ""efg"" ]","Scalar array set differs"
+"Modified","node3","node3","[ 1, 2, 3 ]","{
+  ""a"" : 1,
+  ""b"" : 2
+}","Type mismatch"
+"Present","node4","node4","{}","{}",""
+"Modified","node4.key1","node4","""5""","5","Type mismatch"
+"Present","node4.key2","node4","8","8",""
+"Modified","node4.key3","node4","""on""","""ON""",""
+"Missing","node4.key5","node4","""Y""","","Present only in IPB_rule.json"
+"Missing","node6","node6","","{
+  ""a"" : ""A"",
+  ""b"" : ""B""
+}","Present only in SG_rule.json"

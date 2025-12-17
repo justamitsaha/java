@@ -15,14 +15,14 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 
-@SpringBootApplication
-public class JsonDiffApplication implements CommandLineRunner {
+//@SpringBootApplication
+public class FeatureRuleDiffApplication implements CommandLineRunner {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final JsonDiffService diffService = new JsonDiffService();
 
     public static void main(String[] args) {
-        SpringApplication.run(JsonDiffApplication.class, args);
+        SpringApplication.run(FeatureRuleDiffApplication.class, args);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class JsonDiffApplication implements CommandLineRunner {
             System.out.println(report);
 
             String csv = reporter.formatCsv(diffs, aName, bName);
-            String csvPath = "json-diff-report.csv";
+            String csvPath = "feature-rule-diff-report.csv";
             reporter.writeCsv(csv, csvPath);
             System.out.printf("CSV written to %s%n", csvPath);
 
