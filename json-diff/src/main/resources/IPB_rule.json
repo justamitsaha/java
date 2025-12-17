@@ -1,6 +1,6 @@
 {
     "node1": {},
-    "node3": {},
+    "node3": "abc",
     "node2": {
         "child1": [
             "efg",
