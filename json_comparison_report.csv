@@ -2,7 +2,7 @@
 "Present","node0","node0","""efg""","""efg""",""
 "Modified","node1","node1","{ }","[ ]","Type mismatch"
 "Present","node2","node2","{}","{}",""
-"Present","node2.child1","node2","[]","[]",""
+"Present","node2.child1","node2","[ ""efg"", ""abc"" ]","[ ""abc"", ""efg"" ]",""
 "Modified","node2.child2","node2","[ ""abc"", ""efg"" ]","[ ""xzy"", ""efg"" ]","Scalar array set differs"
 "Modified","node3","node3","[ 1, 2, 3 ]","{
   ""a"" : 1,

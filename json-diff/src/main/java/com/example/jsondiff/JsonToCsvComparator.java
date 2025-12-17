@@ -20,13 +20,13 @@ import java.util.*;
 /**
  * CSV comparator implementing the rules:
  * 1) Present when node exists in both files with same type; record row.
- *    - Scalars: show actual values.
- *    - Objects: show {}.
- *    - Arrays: show [] when types match; content equality still decides Present vs Modified for arrays.
+ * - Scalars: show actual values.
+ * - Objects: show {}.
+ * - Arrays: show [] when types match; content equality still decides Present vs Modified for arrays.
  * 2) Type mismatch ({} vs []) -> Modified (show full values).
  * 3) Recurse only into objects with same type to compare children.
  * 4) Arrays/scalars are leaves; no further recursion.
- *
+ * <p>
  * Extra policies (previously confirmed):
  * - Strings: case-sensitive; Types: strict; null ≠ missing.
  * - Scalar arrays: compare as sets (order-insensitive).
@@ -92,6 +92,7 @@ public class JsonToCsvComparator implements CommandLineRunner {
 
     // ---- Core emission logic according to your 4 rules ----
 
+
     private void emitAndDescend(String path, JsonNode lNode, JsonNode rNode) {
         // Missing on one side
         if (lNode == null && rNode != null) {
@@ -123,7 +124,8 @@ public class JsonToCsvComparator implements CommandLineRunner {
                 String childPath = path + "." + key;
                 JsonNode lc = lNode.get(key);
                 JsonNode rc = rNode.get(key);
-                emitAndStopAtLeaves(childPath, lc, rc); // arrays/scalars are leaves; objects recurse again
+                // arrays/scalars are leaves; objects recurse again
+                emitAndStopAtLeaves(childPath, lc, rc);
             }
             return;
         }
@@ -141,10 +143,12 @@ public class JsonToCsvComparator implements CommandLineRunner {
                 Set<String> ls = scalarSet(la);
                 Set<String> rs = scalarSet(ra);
                 if (ls.equals(rs)) {
-                    csvData.add(row("Present", path, featureName(path), "[]", "[]", ""));
+                    // ✅ Show actual array values for Present
+                    csvData.add(row("Present", path, featureName(path), pretty(la), pretty(ra), ""));
                 } else {
                     // Show full values for Modified
-                    csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra), "Scalar array set differs"));
+                    csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra),
+                            "Scalar array set differs"));
                 }
             } else {
                 // Arrays of objects: key-based alignment (id/code/name) else index-wise
@@ -153,7 +157,8 @@ public class JsonToCsvComparator implements CommandLineRunner {
                         ? arraysEqualByKey(la, ra, align.key)
                         : arraysEqualByIndex(la, ra);
                 if (equal) {
-                    csvData.add(row("Present", path, featureName(path), "[]", "[]", ""));
+                    // ✅ Show actual array values for Present
+                    csvData.add(row("Present", path, featureName(path), pretty(la), pretty(ra), ""));
                 } else {
                     csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra),
                             align.type == AlignmentType.KEY ? ("Array of objects differ by key=" + align.key) : "Array differs by index"));
@@ -173,10 +178,12 @@ public class JsonToCsvComparator implements CommandLineRunner {
         }
     }
 
+
     /**
      * Objects recurse; arrays/scalars stop (Rule 4).
      * This helper makes the intent explicit at child paths.
      */
+
     private void emitAndStopAtLeaves(String path, JsonNode lNode, JsonNode rNode) {
         // Missing
         if (lNode == null && rNode != null) {
@@ -222,9 +229,11 @@ public class JsonToCsvComparator implements CommandLineRunner {
                 Set<String> ls = scalarSet(la);
                 Set<String> rs = scalarSet(ra);
                 if (ls.equals(rs)) {
-                    csvData.add(row("Present", path, featureName(path), "[]", "[]", ""));
+                    // ✅ Show actual array values for Present
+                    csvData.add(row("Present", path, featureName(path), pretty(la), pretty(ra), ""));
                 } else {
-                    csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra), "Scalar array set differs"));
+                    csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra),
+                            "Scalar array set differs"));
                 }
             } else {
                 Alignment align = discoverKey(la, ra);
@@ -232,7 +241,8 @@ public class JsonToCsvComparator implements CommandLineRunner {
                         ? arraysEqualByKey(la, ra, align.key)
                         : arraysEqualByIndex(la, ra);
                 if (equal) {
-                    csvData.add(row("Present", path, featureName(path), "[]", "[]", ""));
+                    // ✅ Show actual array values for Present
+                    csvData.add(row("Present", path, featureName(path), pretty(la), pretty(ra), ""));
                 } else {
                     csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra),
                             align.type == AlignmentType.KEY ? ("Array of objects differ by key=" + align.key) : "Array differs by index"));
