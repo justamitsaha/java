@@ -32,7 +32,7 @@ import java.util.*;
  * - Scalar arrays: compare as sets (order-insensitive).
  * - Arrays of objects: align by key (id/code/name) else index-wise.
  */
-@SpringBootApplication
+//@SpringBootApplication
 public class JsonToCsvComparator implements CommandLineRunner {
 
     private final ObjectMapper mapper = new ObjectMapper();
