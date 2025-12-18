@@ -22,8 +22,11 @@ public class RuleDiff {
     private final List<String[]> csvData = new ArrayList<>();
 
     // Default filenames for fallback mode
-    private final String DEFAULT_FILE_NAME_1 = "IPB_rule.json";
-    private final String DEFAULT_FILE_NAME_2 = "SG_rule.json";
+//    private final String DEFAULT_FILE_NAME_1 = "SGprelogin.rule.json";
+//    private final String DEFAULT_FILE_NAME_2 = "IPBprelogin.rule.json";
+
+    private final String DEFAULT_FILE_NAME_1 = "SG_rule.json";
+    private final String DEFAULT_FILE_NAME_2 = "IPB.rule.json";
 
     // Enum and inner classes for comparison logic
     enum AlignmentType {KEY, INDEX}
@@ -40,25 +43,18 @@ public class RuleDiff {
 
     /**
      * Entry point for the RuleDiff component.
-     * This method decides whether to load files from the provided command-line arguments
-     * or fall back to default files in the resources folder.
-     *
-     * @param args The raw command line arguments (expected to contain file paths/names in the first two positions).
-     * @throws Exception if file loading or CSV writing fails.
      */
     public void execute(String... args) throws Exception {
-        csvData.clear(); // Ensure fresh data for each run
+        csvData.clear();
 
         String fileName1;
         String fileName2;
 
         if (args != null && args.length >= 2) {
-            // Arguments provided: use them as file paths/names
             fileName1 = args[0];
             fileName2 = args[1];
             System.out.println("RuleDiff using arguments: Files=[" + fileName1 + ", " + fileName2 + "]");
         } else {
-            // No arguments provided: fall back to resource files
             fileName1 = DEFAULT_FILE_NAME_1;
             fileName2 = DEFAULT_FILE_NAME_2;
             System.out.println("RuleDiff using fallback: Resource files=[" + fileName1 + ", " + fileName2 + "]");
@@ -67,12 +63,10 @@ public class RuleDiff {
         JsonNode left = loadJson(fileName1);
         JsonNode right = loadJson(fileName2);
 
-        // CSV Header using actual file names for value columns
         csvData.add(new String[]{
                 "Category", "Path", "Feature", fileName1, fileName2, "Details"
         });
 
-        // Boundary: Feature.* else top-level
         boolean useFeatureBoundary =
                 ((left != null && left.has("Feature")) || (right != null && right.has("Feature"))) &&
                         ((left != null && left.get("Feature") != null && left.get("Feature").isObject()) ||
@@ -81,16 +75,13 @@ public class RuleDiff {
         if (useFeatureBoundary) {
             compareBoundaryObject(left.get("Feature"), right.get("Feature"), "Feature", fileName1, fileName2);
         } else {
-            compareBoundaryObject(left, right, "$", fileName1, fileName2); // top-level
+            compareBoundaryObject(left, right, "$", fileName1, fileName2);
         }
 
         Path out = Path.of("json_comparison_report.csv");
         writeCsv(out);
         System.out.println("✅ CSV Report generated: " + out.toAbsolutePath());
     }
-
-
-    // ---- Boundary walker: only objects (Feature.* or top-level) ----
 
     private void compareBoundaryObject(JsonNode leftObj, JsonNode rightObj, String boundaryPath, String f1Name, String f2Name) {
         Set<String> names = new TreeSet<>();
@@ -105,102 +96,7 @@ public class RuleDiff {
         }
     }
 
-    // ---- Core emission logic according to your 4 rules ----
-
-
     private void emitAndDescend(String path, JsonNode lNode, JsonNode rNode, String f1Name, String f2Name) {
-        // Missing on one side
-        if (lNode == null && rNode != null) {
-            csvData.add(row("Missing", path, featureName(path), "", pretty(rNode), "Present only in " + f2Name));
-            return;
-        }
-        if (lNode != null && rNode == null) {
-            csvData.add(row("Missing", path, featureName(path), pretty(lNode), "", "Present only in " + f1Name));
-            return;
-        }
-        if (lNode == null && rNode == null) return; // nothing to do
-
-        // Both sides present
-        // Types differ -> Modified (show full values)
-        if (lNode.getNodeType() != rNode.getNodeType()) {
-            csvData.add(row("Modified", path, featureName(path), pretty(lNode), pretty(rNode), "Type mismatch"));
-            return;
-        }
-
-        // Same type: object / array / scalar
-        if (lNode.isObject() && rNode.isObject()) {
-            // Rule 1+2+3: Present for object nodes, then recurse to children
-            csvData.add(row("Present", path, featureName(path), "{}", "{}", ""));
-            // Recurse into child keys
-            Set<String> keys = new TreeSet<>();
-            lNode.fieldNames().forEachRemaining(keys::add);
-            rNode.fieldNames().forEachRemaining(keys::add);
-            for (String key : keys) {
-                String childPath = path + "." + key;
-                JsonNode lc = lNode.get(key);
-                JsonNode rc = rNode.get(key);
-                // arrays/scalars are leaves; objects recurse again
-                emitAndStopAtLeaves(childPath, lc, rc, f1Name, f2Name);
-            }
-            return;
-        }
-
-        if (lNode.isArray() && rNode.isArray()) {
-            // Arrays are leaves (Rule 4); decide Present vs Modified by content
-            ArrayNode la = (ArrayNode) lNode;
-            ArrayNode ra = (ArrayNode) rNode;
-
-            boolean lScalars = allScalars(la);
-            boolean rScalars = allScalars(ra);
-
-            if (lScalars && rScalars) {
-                // Scalar arrays as sets
-                Set<String> ls = scalarSet(la);
-                Set<String> rs = scalarSet(ra);
-                if (ls.equals(rs)) {
-                    // ✅ Show actual array values for Present
-                    csvData.add(row("Present", path, featureName(path), pretty(la), pretty(ra), ""));
-                } else {
-                    // Show full values for Modified
-                    csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra),
-                            "Scalar array set differs"));
-                }
-            } else {
-                // Arrays of objects: key-based alignment (id/code/name) else index-wise
-                Alignment align = discoverKey(la, ra);
-                boolean equal = (align.type == AlignmentType.KEY)
-                        ? arraysEqualByKey(la, ra, align.key)
-                        : arraysEqualByIndex(la, ra);
-                if (equal) {
-                    // ✅ Show actual array values for Present
-                    csvData.add(row("Present", path, featureName(path), pretty(la), pretty(ra), ""));
-                } else {
-                    csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra),
-                            align.type == AlignmentType.KEY ? ("Array of objects differ by key=" + align.key) : "Array differs by index"));
-                }
-            }
-            return;
-        }
-
-        if (lNode.isValueNode() && rNode.isValueNode()) {
-            // Scalars are leaves (Rule 4)
-            if (scalarEquals((ValueNode) lNode, (ValueNode) rNode)) {
-                // Show actual scalar values for Present
-                csvData.add(row("Present", path, featureName(path), pretty(lNode), pretty(rNode), ""));
-            } else {
-                csvData.add(row("Modified", path, featureName(path), pretty(lNode), pretty(rNode), ""));
-            }
-        }
-    }
-
-
-    /**
-     * Objects recurse; arrays/scalars stop (Rule 4).
-     * This helper makes the intent explicit at child paths.
-     */
-
-    private void emitAndStopAtLeaves(String path, JsonNode lNode, JsonNode rNode, String f1Name, String f2Name) {
-        // Missing
         if (lNode == null && rNode != null) {
             csvData.add(row("Missing", path, featureName(path), "", pretty(rNode), "Present only in " + f2Name));
             return;
@@ -211,58 +107,24 @@ public class RuleDiff {
         }
         if (lNode == null && rNode == null) return;
 
-        // Type mismatch
         if (lNode.getNodeType() != rNode.getNodeType()) {
             csvData.add(row("Modified", path, featureName(path), pretty(lNode), pretty(rNode), "Type mismatch"));
             return;
         }
 
-        // Same type
         if (lNode.isObject() && rNode.isObject()) {
-            // Present row at the object node (show {}), then recurse further
             csvData.add(row("Present", path, featureName(path), "{}", "{}", ""));
             Set<String> keys = new TreeSet<>();
             lNode.fieldNames().forEachRemaining(keys::add);
             rNode.fieldNames().forEachRemaining(keys::add);
             for (String key : keys) {
-                String childPath = path + "." + key;
-                JsonNode lc = lNode.get(key);
-                JsonNode rc = rNode.get(key);
-                emitAndStopAtLeaves(childPath, lc, rc, f1Name, f2Name);
+                emitAndStopAtLeaves(path + "." + key, lNode.get(key), rNode.get(key), f1Name, f2Name);
             }
             return;
         }
 
         if (lNode.isArray() && rNode.isArray()) {
-            // Arrays are leaves; Present/Modified by content
-            ArrayNode la = (ArrayNode) lNode;
-            ArrayNode ra = (ArrayNode) rNode;
-            boolean lScalars = allScalars(la);
-            boolean rScalars = allScalars(ra);
-
-            if (lScalars && rScalars) {
-                Set<String> ls = scalarSet(la);
-                Set<String> rs = scalarSet(ra);
-                if (ls.equals(rs)) {
-                    // ✅ Show actual array values for Present
-                    csvData.add(row("Present", path, featureName(path), pretty(la), pretty(ra), ""));
-                } else {
-                    csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra),
-                            "Scalar array set differs"));
-                }
-            } else {
-                Alignment align = discoverKey(la, ra);
-                boolean equal = (align.type == AlignmentType.KEY)
-                        ? arraysEqualByKey(la, ra, align.key)
-                        : arraysEqualByIndex(la, ra);
-                if (equal) {
-                    // ✅ Show actual array values for Present
-                    csvData.add(row("Present", path, featureName(path), pretty(la), pretty(ra), ""));
-                } else {
-                    csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra),
-                            align.type == AlignmentType.KEY ? ("Array of objects differ by key=" + align.key) : "Array differs by index"));
-                }
-            }
+            handleArrayComparison(path, (ArrayNode) lNode, (ArrayNode) rNode, f1Name, f2Name);
             return;
         }
 
@@ -275,21 +137,105 @@ public class RuleDiff {
         }
     }
 
-    // ---- Equality helpers (strict types, case-sensitive, null≠missing) ----
+    private void emitAndStopAtLeaves(String path, JsonNode lNode, JsonNode rNode, String f1Name, String f2Name) {
+        if (lNode == null && rNode != null) {
+            csvData.add(row("Missing", path, featureName(path), "", pretty(rNode), "Present only in " + f2Name));
+            return;
+        }
+        if (lNode != null && rNode == null) {
+            csvData.add(row("Missing", path, featureName(path), pretty(lNode), "", "Present only in " + f1Name));
+            return;
+        }
+        if (lNode == null && rNode == null) return;
+
+        if (lNode.getNodeType() != rNode.getNodeType()) {
+            csvData.add(row("Modified", path, featureName(path), pretty(lNode), pretty(rNode), "Type mismatch"));
+            return;
+        }
+
+        if (lNode.isObject() && rNode.isObject()) {
+            csvData.add(row("Present", path, featureName(path), "{}", "{}", ""));
+            Set<String> keys = new TreeSet<>();
+            lNode.fieldNames().forEachRemaining(keys::add);
+            rNode.fieldNames().forEachRemaining(keys::add);
+            for (String key : keys) {
+                emitAndStopAtLeaves(path + "." + key, lNode.get(key), rNode.get(key), f1Name, f2Name);
+            }
+            return;
+        }
+
+        if (lNode.isArray() && rNode.isArray()) {
+            handleArrayComparison(path, (ArrayNode) lNode, (ArrayNode) rNode, f1Name, f2Name);
+            return;
+        }
+
+        if (lNode.isValueNode() && rNode.isValueNode()) {
+            if (scalarEquals((ValueNode) lNode, (ValueNode) rNode)) {
+                csvData.add(row("Present", path, featureName(path), pretty(lNode), pretty(rNode), ""));
+            } else {
+                csvData.add(row("Modified", path, featureName(path), pretty(lNode), pretty(rNode), ""));
+            }
+        }
+    }
+
+    /**
+     * Specialized handler for arrays.
+     * If array contains objects (like demographicRule.rules), we drill down.
+     * If array contains scalars (like simple lists), we treat it as a leaf.
+     */
+    private void handleArrayComparison(String path, ArrayNode la, ArrayNode ra, String f1Name, String f2Name) {
+        boolean lScalars = allScalars(la);
+        boolean rScalars = allScalars(ra);
+
+        if (lScalars && rScalars) {
+            // Leaf logic for scalar arrays
+            Set<String> ls = scalarSet(la);
+            Set<String> rs = scalarSet(ra);
+            if (ls.equals(rs)) {
+                csvData.add(row("Present", path, featureName(path), pretty(la), pretty(ra), ""));
+            } else {
+                csvData.add(row("Modified", path, featureName(path), pretty(la), pretty(ra), "Scalar array set differs"));
+            }
+        } else {
+            // Complex logic for arrays of objects
+            csvData.add(row("Present", path, featureName(path), "[]", "[]", ""));
+
+            Alignment align = discoverKey(la, ra);
+            if (align.type == AlignmentType.KEY) {
+                // Key-based alignment for objects in arrays
+                Map<String, JsonNode> am = new HashMap<>();
+                Map<String, JsonNode> bm = new HashMap<>();
+                la.forEach(n -> am.put(n.get(align.key).asText(), n));
+                ra.forEach(n -> bm.put(n.get(align.key).asText(), n));
+
+                Set<String> allKeys = new TreeSet<>(am.keySet());
+                allKeys.addAll(bm.keySet());
+
+                for (String k : allKeys) {
+                    String itemPath = path + "[" + align.key + "=" + k + "]";
+                    emitAndStopAtLeaves(itemPath, am.get(k), bm.get(k), f1Name, f2Name);
+                }
+            } else {
+                // Index-based alignment if no identifying key found
+                int max = Math.max(la.size(), ra.size());
+                for (int i = 0; i < max; i++) {
+                    String itemPath = path + "[" + i + "]";
+                    emitAndStopAtLeaves(itemPath, la.get(i), ra.get(i), f1Name, f2Name);
+                }
+            }
+        }
+    }
 
     private boolean scalarEquals(ValueNode a, ValueNode b) {
         if (a.isTextual() && b.isTextual()) {
-            // Case-insensitive comparison for "on" / "ON" as per JSON provided
-            // NOTE: The user's JSON had "on" vs "ON". Assuming case-insensitive text comparison is desired for values.
             return a.asText().equalsIgnoreCase(b.asText());
         }
         if (a.isNumber() && b.isNumber()) {
-            return a.numberValue().equals(b.numberValue()); // strict
+            return a.numberValue().equals(b.numberValue());
         }
         if (a.isBoolean() && b.isBoolean()) {
             return a.booleanValue() == b.booleanValue();
         }
-        // null vs null handled by NodeType equality before
         return a.toString().equals(b.toString());
     }
 
@@ -304,7 +250,7 @@ public class RuleDiff {
         Set<String> out = new HashSet<>();
         for (JsonNode n : arr) {
             ValueNode v = (ValueNode) n;
-            if (v.isTextual()) out.add(v.asText().toLowerCase()); // Lowercase for set comparison
+            if (v.isTextual()) out.add(v.asText().toLowerCase());
             else if (v.isNumber()) out.add(String.valueOf(v.numberValue()));
             else if (v.isBoolean()) out.add(String.valueOf(v.booleanValue()));
             else if (v.isNull()) out.add("null");
@@ -314,122 +260,32 @@ public class RuleDiff {
     }
 
     private Alignment discoverKey(ArrayNode a, ArrayNode b) {
-        List<String> candidates = Arrays.asList("id", "code", "name");
+        List<String> candidates = Arrays.asList("id", "code", "name", "demographic_PhoneNumberCountryCode");
         for (String k : candidates) {
-            if (keyExistsInAll(a, k) && keyExistsInAll(b, k)) {
+            if (keyExistsInSome(a, k) || keyExistsInSome(b, k)) {
                 return new Alignment(AlignmentType.KEY, k);
             }
         }
         return new Alignment(AlignmentType.INDEX, null);
     }
 
-    private boolean keyExistsInAll(ArrayNode arr, String key) {
+    private boolean keyExistsInSome(ArrayNode arr, String key) {
         for (JsonNode n : arr) {
-            if (!n.isObject()) return false;
-            if (!n.has(key)) return false;
+            if (n.isObject() && n.has(key)) return true;
         }
-        return true;
+        return false;
     }
-
-    private boolean arraysEqualByKey(ArrayNode a, ArrayNode b, String key) {
-        Map<String, JsonNode> am = new HashMap<>();
-        Map<String, JsonNode> bm = new HashMap<>();
-        for (JsonNode n : a) am.put(n.get(key).asText(), n);
-        for (JsonNode n : b) bm.put(n.get(key).asText(), n);
-        if (!am.keySet().equals(bm.keySet())) return false;
-        for (String k : am.keySet()) {
-            if (!deepEqualObjects(am.get(k), bm.get(k))) return false;
-        }
-        return true;
-    }
-
-    private boolean deepEqualObjects(JsonNode a, JsonNode b) {
-        // Compare two objects strictly (used for array-of-object items)
-        if (a == null || b == null) return false;
-        if (!a.isObject() || !b.isObject()) return false;
-        Set<String> keys = new HashSet<>();
-        a.fieldNames().forEachRemaining(keys::add);
-        b.fieldNames().forEachRemaining(keys::add);
-        for (String k : keys) {
-            JsonNode av = a.get(k);
-            JsonNode bv = b.get(k);
-            if (av == null || bv == null) return false;
-            // dispatch by type
-            if (av.getNodeType() != bv.getNodeType()) return false;
-            if (av.isValueNode() && bv.isValueNode()) {
-                if (!scalarEquals((ValueNode) av, (ValueNode) bv)) return false;
-            } else if (av.isArray() && bv.isArray()) {
-                ArrayNode aa = (ArrayNode) av;
-                ArrayNode bb = (ArrayNode) bv;
-                boolean aSc = allScalars(aa), bSc = allScalars(bb);
-                if (aSc && bSc) {
-                    if (!scalarSet(aa).equals(scalarSet(bb))) return false;
-                } else {
-                    Alignment al = discoverKey(aa, bb);
-                    boolean eq = (al.type == AlignmentType.KEY)
-                            ? arraysEqualByKey(aa, bb, al.key)
-                            : arraysEqualByIndex(aa, bb);
-                    if (!eq) return false;
-                }
-            } else if (av.isObject() && bv.isObject()) {
-                if (!deepEqualObjects(av, bv)) return false;
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean arraysEqualByIndex(ArrayNode a, ArrayNode b) {
-        if (a.size() != b.size()) return false;
-        for (int i = 0; i < a.size(); i++) {
-            JsonNode av = a.get(i);
-            JsonNode bv = b.get(i);
-            if (av.getNodeType() != bv.getNodeType()) return false;
-            if (av.isValueNode() && bv.isValueNode()) {
-                if (!scalarEquals((ValueNode) av, (ValueNode) bv)) return false;
-            } else if (av.isArray() && bv.isArray()) {
-                ArrayNode aa = (ArrayNode) av;
-                ArrayNode bb = (ArrayNode) bv;
-                boolean aSc = allScalars(aa), bSc = allScalars(bb);
-                if (aSc && bSc) {
-                    if (!scalarSet(aa).equals(scalarSet(bb))) return false;
-                } else {
-                    Alignment al = discoverKey(aa, bb);
-                    boolean eq = (al.type == AlignmentType.KEY)
-                            ? arraysEqualByKey(aa, bb, al.key)
-                            : arraysEqualByIndex(aa, bb);
-                    if (!eq) return false;
-                }
-            } else if (av.isObject() && bv.isObject()) {
-                if (!deepEqualObjects(av, bv)) return false;
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // ---- Utilities ----
 
     private JsonNode loadJson(String filename) throws IOException {
-        // First try to load from the file system path
         try {
             Path filePath = Path.of(filename);
             if (Files.exists(filePath)) {
-                System.out.println("Loading from file system: " + filename);
                 return mapper.readTree(Files.newInputStream(filePath));
             }
-        } catch (Exception e) {
-            // Ignore if file system read fails, fall back to classpath
-        }
+        } catch (Exception ignored) {}
 
-        // Fallback to classpath resource loading (for JAR/resources folder)
         ClassPathResource res = new ClassPathResource(filename);
-        if (!res.exists()) {
-            throw new IOException("Resource not found: " + filename + " (File system or Classpath)");
-        }
-        System.out.println("Loading from classpath: " + filename);
+        if (!res.exists()) throw new IOException("Resource not found: " + filename);
         try (InputStream is = res.getInputStream()) {
             return mapper.readTree(is);
         }
@@ -444,13 +300,9 @@ public class RuleDiff {
         if (n.isValueNode()) {
             ValueNode v = (ValueNode) n;
             if (v.isTextual()) return "\"" + v.asText() + "\"";
-            if (v.isNumber()) return String.valueOf(v.numberValue());
-            if (v.isBoolean()) return String.valueOf(v.booleanValue());
-            if (v.isNull()) return "null";
             return v.toString();
         }
         try {
-            // Return compact JSON string for array/object cells in CSV
             return mapper.writeValueAsString(n);
         } catch (IOException e) {
             return n.toString();
@@ -483,12 +335,10 @@ public class RuleDiff {
     }
 
     private String joinRow(String[] row) {
-        // Comma-separated CSV with safe quoting
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < row.length; i++) {
             String cell = row[i] == null ? "" : row[i];
-            String escaped = cell.replace("\"", "\"\"");
-            sb.append("\"").append(escaped).append("\"");
+            sb.append("\"").append(cell.replace("\"", "\"\"")).append("\"");
             if (i < row.length - 1) sb.append(",");
         }
         return sb.toString();

@@ -13,7 +13,7 @@ import java.nio.file.Path;
 @Component
 public class FeatureCompare {
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     // Default filenames for resource mode
     private static final String DEFAULT_A_NAME = "SG.json";
@@ -24,9 +24,9 @@ public class FeatureCompare {
      *
      * @param objectMapper The Jackson ObjectMapper provided by Spring.
      */
-    public FeatureCompare(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+//    public FeatureCompare(ObjectMapper objectMapper) {
+//        this.objectMapper = objectMapper;
+//    }
 
     /**
      * Entry point for the FeatureCompare component.
