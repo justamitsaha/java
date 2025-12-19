@@ -16,8 +16,8 @@ public class FeatureCompare {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // Default filenames for resource mode
-    private static final String DEFAULT_A_NAME = "SG.json";
-    private static final String DEFAULT_B_NAME = "IPB.json";
+    private static final String DEFAULT_A_NAME = "Feature_SG.json";
+    private static final String DEFAULT_B_NAME = "Feature_IPB.json";
 
     /**
      * Constructor for Dependency Injection.

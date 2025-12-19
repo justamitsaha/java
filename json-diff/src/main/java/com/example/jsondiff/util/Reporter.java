@@ -108,7 +108,7 @@ public class Reporter {
 
     /**
      * CSV output: Category, Path, Feature, <A_FileName>, <B_FileName>, Details
-     * - The two value columns are named with the actual file labels (e.g., SG.json, IPB.json).
+     * - The two value columns are named with the actual file labels (e.g., Feature_SG.json, Feature_IPB.json).
      * - Values are side-by-side for easy comparison.
      * - Multiline JSON values are quoted and inner quotes escaped.
      */

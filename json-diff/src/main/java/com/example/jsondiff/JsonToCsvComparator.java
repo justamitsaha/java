@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -38,8 +37,8 @@ public class JsonToCsvComparator implements CommandLineRunner {
     private final ObjectMapper mapper = new ObjectMapper();
 
     // Resource file names (IntelliJ/JAR) - can be parameterized later
-    private final String FILE_NAME_1 = "IPB_rule.json";
-    private final String FILE_NAME_2 = "SG_rule.json";
+    private final String FILE_NAME_1 = "Rule_IPB.json";
+    private final String FILE_NAME_2 = "Rule_SG.json";
 
     // CSV rows: Category, Path, Feature, <file1>, <file2>, Details
     private final List<String[]> csvData = new ArrayList<>();

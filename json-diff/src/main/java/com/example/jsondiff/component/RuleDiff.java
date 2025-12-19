@@ -22,11 +22,11 @@ public class RuleDiff {
     private final List<String[]> csvData = new ArrayList<>();
 
     // Default filenames for fallback mode
-//    private final String DEFAULT_FILE_NAME_1 = "SGprelogin.rule.json";
-//    private final String DEFAULT_FILE_NAME_2 = "IPBprelogin.rule.json";
+    private final String DEFAULT_FILE_NAME_1 = "pre_login_SG_rule.json";
+    private final String DEFAULT_FILE_NAME_2 = "pre_login_IPB_rule.json";
 
-    private final String DEFAULT_FILE_NAME_1 = "SG_rule.json";
-    private final String DEFAULT_FILE_NAME_2 = "IPB.rule.json";
+    //private final String DEFAULT_FILE_NAME_1 = "Rule_SG.json";
+    //private final String DEFAULT_FILE_NAME_2 = "Rule_IPB.json";
 
     // Enum and inner classes for comparison logic
     enum AlignmentType {KEY, INDEX}

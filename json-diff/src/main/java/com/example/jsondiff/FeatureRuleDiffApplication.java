@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.InputStream;
@@ -31,8 +30,8 @@ public class FeatureRuleDiffApplication implements CommandLineRunner {
 
         if (args == null || args.length == 0) {
             // RESOURCES mode (IntelliJ)
-            String aName = "SG.json";
-            String bName = "IPB.json";
+            String aName = "Feature_SG.json";
+            String bName = "Feature_IPB.json";
 
             System.out.printf("Running in RESOURCES mode (IntelliJ). A=%s, B=%s%n", aName, bName);
 
@@ -98,7 +97,7 @@ public class FeatureRuleDiffApplication implements CommandLineRunner {
                         "  # JAR (file mode) — pass paths as arguments\n" +
                         "  java -jar json-diff.jar <fileA.json> <fileB.json> [output.txt]\n\n" +
                         "  # IntelliJ/IDE (resources mode) — run with NO arguments\n" +
-                        "  # The app will load SG.json and IPB.json from src/main/resources automatically.\n"
+                        "  # The app will load Feature_SG.json and Feature_IPB.json from src/main/resources automatically.\n"
         );
     }
 
