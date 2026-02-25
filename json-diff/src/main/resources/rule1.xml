@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Feature name="LoginValidation" version="1.0">
+    <Rules>
+        <Rule id="R001" active="true">
+            <Condition>username != null</Condition>
+            <Action>ALLOW</Action>
+        </Rule>
+        <Rule id="R002" active="false">
+            <Condition>password.length > 8</Condition>
+            <Action>DENY</Action>
+        </Rule>
+    </Rules>
+    <Metadata>
+        <Author>System_SG</Author>
+        <LastModified>2023-10-01</LastModified>
+    </Metadata>
+</Feature>

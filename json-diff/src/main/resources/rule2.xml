@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Feature name="LoginValidation" version="1.1"> <Rules>
+    <Rule id="R001" active="true">
+        <Condition>username != null</Condition>
+        <Action>ALLOW</Action>
+    </Rule>
+    <Rule id="R003" active="true"> <Condition>mfa_token != null</Condition>
+        <Action>CHALLENGE</Action>
+    </Rule>
+</Rules>
+    <Metadata>
+        <Author>System_IPB</Author> <Namespace>Global</Namespace> </Metadata>
+</Feature>
