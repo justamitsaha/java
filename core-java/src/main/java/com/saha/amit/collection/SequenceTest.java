@@ -1,6 +1,5 @@
 package com.saha.amit.collection;
 
-import com.github.javafaker.Faker;
 
 import java.util.LinkedHashMap;
 import java.util.SequencedMap;
@@ -8,9 +7,9 @@ import java.util.SequencedMap;
 public class SequenceTest {
     public static void main(String[] args) {
         SequencedMap<Integer, String> stringSequencedMap = new LinkedHashMap<>();
-        Faker faker = new Faker();
+
         for (int i =0; i< 5;i++){
-            stringSequencedMap.put(i,faker.gameOfThrones().character());
+            stringSequencedMap.put(i,"hello"+i);
         }
 
         System.out.println(stringSequencedMap);

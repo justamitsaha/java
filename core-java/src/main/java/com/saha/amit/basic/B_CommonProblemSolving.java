@@ -1,8 +1,5 @@
 package com.saha.amit.basic;
 
-import com.github.javafaker.Faker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -11,29 +8,29 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class B_CommonProblemSolving {
-    private static final Logger log = LoggerFactory.getLogger(B_CommonProblemSolving.class);
-    private static final Faker faker = new Faker();
+    
+    private static final Random random = new Random();
     static int[] integers = new int[4];
     static int input = 0;
     static int smallInput = 0;
 
     static {
-        log.info("Initializing");
-        input = faker.number().numberBetween(999, 9999);
-        smallInput = faker.number().numberBetween(0, 25);
+        System.out.println("Initializing");
+        input = random.nextInt(999,9999);
+        smallInput = random.nextInt(0, 25); // Generate a random integer between 0 and 19
         for (int i = 0; i < integers.length; i++) {
-            integers[i] = faker.number().numberBetween(999, 9999);
+            integers[i] = random.nextInt(999, 9999); // Generate random integers between 0 and 99
         }
     }
 
     public static void main(String[] args) {
-        log.info("Sum of all the digits of the Input: {} is : {}", input, sumOfDigit(input));
-        log.info("Largest element of this integer array: {} using stream, is {}", integers, findLargestUsingStrem(integers));
-        log.info("Largest element of this integer array: {} using loops, is {}", integers, findLargestUsingLoop(integers));
-        log.info("2nd Largest element of this integer array: {} using loops, is {}", integers, findSecondLargest(integers));
+        System.out.printf("Sum of all the digits of the Input: %s is : %s%n", input, sumOfDigit(input));
+        System.out.printf("Largest element of this integer array: %s using stream, is %s%n", integers, findLargestUsingStrem(integers));
+        System.out.printf("Largest element of this integer array: %s using loops, is %s%n", integers, findLargestUsingLoop(integers));
+        System.out.printf("2nd Largest element of this integer array: %s using loops, is %s%n", integers, findSecondLargest(integers));
         swapWithoutTempVariable();
         fibonacciPrint(9);
-        log.info("Factorial of: {} is: {} ", smallInput, factorial(smallInput));
+        System.out.printf("Factorial of: %s is: %s %n", smallInput, factorial(smallInput));
     }
 
 
@@ -44,7 +41,7 @@ public class B_CommonProblemSolving {
             sum += temp % 10;
             temp /= 10; //This is equivalent to a = a / b;
         }
-        log.info("Sum of the digits of number: {} using basic loop is : {}", number, sum);
+        System.out.printf("Sum of the digits of number: %s using basic loop is : %s%n", number, sum);
 
         return number.toString()
                 .chars()
@@ -108,19 +105,19 @@ public class B_CommonProblemSolving {
                 .skip(1)
                 .findFirst()
                 .orElse(-1);
-        log.info(String.valueOf(temp));
-        //log.info("Second Largest using basic loop: {}", secondLargest);
+        System.out.println(String.valueOf(temp));
+        //System.out.printf("Second Largest using basic loop: %s%n", secondLargest);
         return secondLargest;
     }
 
     public static void swapWithoutTempVariable() {
         int a = 5;
         int b = 10;
-        log.info("Before Swap: a = {}, b = {}", a, b);
+        System.out.printf("Before Swap: a = %s, b = %s%n", a, b);
         a = a + b; // a now becomes 15
         b = a - b; // b becomes 5
         a = a - b; // a becomes 10
-        log.info("After Swap: a = {}, b = {}", a, b);
+        System.out.printf("After Swap: a = %s, b = %s%n", a, b);
     }
 
     public static long factorial(int input) {
@@ -151,7 +148,7 @@ public class B_CommonProblemSolving {
 
     public static void fibonacciPrint(int limit) {
         if (limit <= 0) {
-            log.info("Limit must be greater than 0");
+            System.out.println("Limit must be greater than 0");
             return;
         }
 
@@ -168,7 +165,7 @@ public class B_CommonProblemSolving {
             list.add(next);
         }
 
-        log.info("Fibonacci (loop) {}", list);
+        System.out.printf("Fibonacci (loop) %s%n", list);
 
         // ----- STREAM VERSION -----
         List<Long> streamList = Stream.iterate(new long[]{0, 1}, f -> new long[]{f[1], f[0] + f[1]})
@@ -176,12 +173,12 @@ public class B_CommonProblemSolving {
                 .map(f -> f[0])
                 .collect(Collectors.toList());
 
-        log.info("Fibonacci (stream) {}", streamList);
+        System.out.printf("Fibonacci (stream) %s%n", streamList);
     }
 
 
     public static Map<String, Integer> countWordFrequency(String str) {
-        log.info("Input: {}", str);
+        System.out.printf("Input: %s%n", str);
 
         // Normalize input — lowercase and remove punctuation
         str = str.toLowerCase().replaceAll("[^a-z\\s]", ""); // keep only letters and spaces
@@ -196,7 +193,7 @@ public class B_CommonProblemSolving {
             }
         }
 
-        log.info("Word Frequency: {}", wordCount);
+        System.out.printf("Word Frequency: %s%n", wordCount);
         return wordCount;
     }
 

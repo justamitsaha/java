@@ -1,23 +1,22 @@
 package com.saha.amit.basic;
 
-import com.github.javafaker.Faker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class StringBasic {
-    private static final Logger log = LoggerFactory.getLogger(StringBasic.class);
+    
 
-    static Faker faker = new Faker();
     static boolean printLongLogs = true;
 
     public static void main(String[] args) {
-        String st = faker.howIMetYourMother().catchPhrase();
+        String st = "hello world";
         //Un comment below for very long input to calculate performance, it disables logs which print inout/output
-        st = faker.lorem().sentence(9000000);         printLongLogs = false;
+        st = """
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                """;
+        printLongLogs = false;
         reverseUsingCollection(st);
         reverseSimple(st);
         reverseUsingStream(st);
@@ -37,9 +36,9 @@ public class StringBasic {
         StringBuilder result = new StringBuilder(characters.size());
         characters.forEach(result::append);
         Long end = System.currentTimeMillis();
-        log.info("Time taken for collection: {} ", (end - start));
+        System.out.printf("Time taken for collection: %s %n", (end - start));
         if (printLongLogs)
-            log.info("Reverse using collections Input String: \"{}\" and Reversed String: \"{}\" ", st, result);
+            System.out.printf("Reverse using collections Input String: \"%s\" and Reversed String: \"%s\" %n", st, result);
     }
 
     /* Very simple loops  low level code fast*/
@@ -51,9 +50,9 @@ public class StringBasic {
             result.append(ch[i]);
         }
         Long end = System.currentTimeMillis();
-        log.info("Time taken for simple loop: {} ", (end - start));
+        System.out.printf("Time taken for simple loop: %s %n", (end - start));
         if (printLongLogs)
-            log.info("Reverse using simple loop Input String: \"{}\" and Reversed String: \"{}\" ", st, result);
+            System.out.printf("Reverse using simple loop Input String: \"%s\" and Reversed String: \"%s\" %n", st, result);
     }
 
     /*
@@ -74,9 +73,9 @@ public class StringBasic {
                                     .collect(Collectors.joining());
                         }));
         Long end = System.currentTimeMillis();
-        log.info("Time taken for stream: {} ", (end - start));
+        System.out.printf("Time taken for stream: %s %n", (end - start));
         if (printLongLogs)
-            log.info("Reverse using stream Input String: \"{}\" and Reversed String: \"{}\"", st, result);
+            System.out.printf("Reverse using stream Input String: \"%s\" and Reversed String: \"%s\"%n", st, result);
     }
 
     /*
@@ -88,9 +87,9 @@ public class StringBasic {
         String cleaned = st.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
         boolean bool = cleaned.contentEquals(new StringBuilder(cleaned).reverse());
         Long end = System.currentTimeMillis();
-        log.info("Time taken for palindrome: {} ", (end - start));
+        System.out.printf("Time taken for palindrome: %s %n", (end - start));
         if (printLongLogs)
-            log.info("Is this input Palindrome:  \"{}\", result: {}", st, bool);
+            System.out.printf("Is this input Palindrome:  \"%s\", result: %s%n", st, bool);
     }
 
 
@@ -107,8 +106,8 @@ public class StringBasic {
             }
         }
         Long end = System.currentTimeMillis();
-        log.info("Time taken for counting vowels and constants: {} ", (end - start));
+        System.out.printf("Time taken for counting vowels and constants: %s %n", (end - start));
         if (printLongLogs)
-            log.info("Vowels: {}, Consonants: {}", vowels, consonants);
+            System.out.printf("Vowels: %s, Consonants: %s%n", vowels, consonants);
     }
 }

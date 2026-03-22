@@ -1,11 +1,6 @@
 package com.saha.amit.collection;
 
-import com.github.javafaker.Faker;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ArrayListPerformance2 {
 
@@ -37,9 +32,9 @@ public class ArrayListPerformance2 {
     }
 
     public static List<Employee> generateEmployee(int count, List<Employee> list){
-        Faker faker = new Faker();
+        Random random = new Random();
         for (int i=0; i<count;i++){
-            Employee employee = new Employee(i, faker.gameOfThrones().character(),faker.random().nextInt(100, 100_000));
+            Employee employee = new Employee(i, "Hello"+i, random.nextInt(100, 100_000));
             list.add(employee);
         }
 
