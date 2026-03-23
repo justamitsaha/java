@@ -68,7 +68,7 @@ public class ExpertConcurrencyPractice {
 
     // 3) Structured concurrency (ShutdownOnFailure)
     static void structuredTaskScopeDemo() {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+        /*try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
             Subtask s1 = new Subtask("A", 200, false);
             Subtask s2 = new Subtask("B", 400, false);
             Subtask s3 = new Subtask("C", 250, true); // will fail
@@ -84,7 +84,7 @@ public class ExpertConcurrencyPractice {
 //            } catch (Exception e) {
 //                System.out.println("One task failed; others cancelled: " + e.getMessage());
 //            }
-        }
+        }*/
     }
 
     static class Subtask implements Callable<String> {
