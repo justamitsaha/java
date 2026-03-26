@@ -8,25 +8,50 @@ import java.util.Random;
 
 public class A_BasicOperations {
 
-    
+    static class Test {
+        int i;
+        boolean b;
+        float f;
+        double d;
+        char c;
+
+        @Override
+        public String toString() {
+            return "Test{i=" + i + ", b=" + b + ", f=" + f + ", d=" + d + ", c=" + c + '}';
+        }
+    }
+
     public static final Random random = new Random();
 
     public static void main(String[] args) {
-        // Only i initialized not j also can use un-initialized local variables Class level variables get default values
+        initialization();
+        incrementDecrement();
+        callByValue();
+    }
+
+    /*
+    Local primitive variable don't get initialized automatically. If we don't initialize them
+    and try to use it will give compilation error. Class level variables however gets initialized
+    automatically and get a default value
+     */
+    public static void initialization() {
         int i, j = 8;
+        System.out.println("j" + j);
+        Test t = new Test();
+        System.out.println(t.toString());
+    }
+
+
+    public static void incrementDecrement() {
         int k = 8, l = 8; //both initialized
         System.out.printf("k *= 2 equals: %s %n", k *= 2);
         System.out.printf("k += 4 equals: %s %n", k += 4);
         System.out.printf("k -= 4 equals: %s %n", k -= 4);
         System.out.printf("k /= 2 equals: %s %n", k /= 2);
+        int m = 0;
+        System.out.println(m++);
+        System.out.println(++m);
 
-        callByValue();
-        incrementDecement();
-
-    }
-
-
-    public static void incrementDecement() {
         int i = 5;
         i = i++ + ++i;
         System.out.printf("Value of i++ + ++i is:%s%n", i);
