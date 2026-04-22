@@ -6,20 +6,7 @@ import com.saha.amit.dto.Employee;
 import java.util.Random;
 
 
-public class A_BasicOperations {
-
-    static class Test {
-        int i;
-        boolean b;
-        float f;
-        double d;
-        char c;
-
-        @Override
-        public String toString() {
-            return "Test{i=" + i + ", b=" + b + ", f=" + f + ", d=" + d + ", c=" + c + '}';
-        }
-    }
+public class A_LiteralsPrimitives {
 
     public static final Random random = new Random();
 
@@ -30,14 +17,13 @@ public class A_BasicOperations {
     }
 
     /*
-    Local primitive variable don't get initialized automatically. If we don't initialize them
-    and try to use it will give compilation error. Class level variables however gets initialized
-    automatically and get a default value
+        local primitives don't get initialized to default values
+        If they belong to class variable then they have default values
      */
     public static void initialization() {
         int i, j = 8;
-        System.out.println("j" + j);
-        Test t = new Test();
+        System.out.println("j" + j);  //can't use i as it is uninitialized
+        Test t = new Test();  // All the variable  of Test class get initialized to default values
         System.out.println(t.toString());
     }
 
@@ -125,6 +111,20 @@ public class A_BasicOperations {
     public static void changeEmployee(Employee employee) {
         employee.setName("Adam");
         employee.setSalary(34);
+    }
+
+
+    static class Test {
+        int i;
+        boolean b;
+        float f;
+        double d;
+        char c;
+
+        @Override
+        public String toString() {
+            return "Test{i=" + i + ", b=" + b + ", f=" + f + ", d=" + d + ", c=" + c + '}';
+        }
     }
 
 

@@ -18,7 +18,7 @@ public class CompareSortCollection {
 
         @Override
         public String toString() {
-            return "Movies{id='" + id + '\'' + ", name='" + name+"}";
+            return "Movies{id='" + id + '\'' + ", name='" + name + "}";
         }
 
 
@@ -47,7 +47,7 @@ public class CompareSortCollection {
         return moviesList;
     }
 
-    static class EarningComparator implements Comparator<Movies>{
+    static class EarningComparator implements Comparator<Movies> {
 
         @Override
         public int compare(Movies o1, Movies o2) {
