@@ -13,14 +13,14 @@ public class CoreThreadsPractice {
         Scanner sc = new Scanner(System.in);
 
         while (true) {
-            System.out.println("\n===== Core Threads & Concurrency (Java 21) =====");
-            System.out.println("1. Create & Start Threads (Runnable/Lambda)");
-            System.out.println("2. Sleep, Join & Thread States");
-            System.out.println("3. Race Condition Demo (Incorrect)");
-            System.out.println("4. Fix Race Condition with synchronized");
-            System.out.println("5. Daemon Thread Demo");
-            System.out.println("0. Exit");
-            System.out.print("Choose: ");
+//            System.out.println("\n===== Core Threads & Concurrency (Java 21) =====");
+//            System.out.println("1. Create & Start Threads (Runnable/Lambda)");
+//            System.out.println("2. Sleep, Join & Thread States");
+//            System.out.println("3. Race Condition Demo (Incorrect)");
+//            System.out.println("4. Fix Race Condition with synchronized");
+//            System.out.println("5. Daemon Thread Demo");
+//            System.out.println("0. Exit");
+//            System.out.print("Choose: ");
 
             int choice = readInt(sc);
             switch (choice) {

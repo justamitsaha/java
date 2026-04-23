@@ -4,42 +4,53 @@ import java.util.*;
 
 public class ArrayListPerformance2 {
 
-    public static void main(String[] args) {
-        int counter = 900000;
-        int filter = 50_000;
-        List<Employee> arrayList = new ArrayList<>();
-        List<Employee> linkedList = new LinkedList<>();
+    static List<Employee> arrayList = new ArrayList<>();
+    static List<Employee> linkedList = new LinkedList<>();
+    static int counter = 900000;
+    static int filter = 50_000;
 
+
+    static {
+        Random random = new Random();
         long start1 = System.currentTimeMillis();
-        generateEmployee(counter, arrayList);
+        for (int i = 0; i < counter; i++) {
+            Employee employee = new Employee(i, "Hello" + i, random.nextInt(100, 100_000));
+            arrayList.add(employee);
+        }
         long end1 = System.currentTimeMillis();
         System.out.println("Time taken to generate Array List With counter " + counter + " Time taken " + (end1 - start1));
 
         start1 = System.currentTimeMillis();
-        generateEmployee(counter, linkedList);
+        for (int i = 0; i < counter; i++) {
+            Employee employee = new Employee(i, "Hello" + i, random.nextInt(100, 100_000));
+            linkedList.add(employee);
+        }
         end1 = System.currentTimeMillis();
         System.out.println("Time taken to generate Linked List With counter " + counter + " Time taken " + (end1 - start1));
+    }
 
-        start1 = System.currentTimeMillis();
+    public static void main(String[] args) {
+        long start1 = System.currentTimeMillis();
         filterEmployee(filter, arrayList);
-        end1 = System.currentTimeMillis();
+        long end1 = System.currentTimeMillis();
         System.out.println("Time taken to Filter Array List With counter " + counter + " Time taken " + (end1 - start1));
 
         start1 = System.currentTimeMillis();
         filterEmployee(filter, linkedList);
         end1 = System.currentTimeMillis();
         System.out.println("Time taken to Filter Linked List With counter " + counter + " Time taken " + (end1 - start1));
+
+        start1 = System.currentTimeMillis();
+        Collections.sort(arrayList, new SalaryComparator());
+        end1 = System.currentTimeMillis();
+        System.out.println("Time taken to Sort Array List With counter " + counter + " Time taken " + (end1 - start1));
+
+        start1 = System.currentTimeMillis();
+        Collections.sort(linkedList, new SalaryComparator());
+        end1 = System.currentTimeMillis();
+        System.out.println("Time taken to Sort Linked List With counter " + counter + " Time taken " + (end1 - start1));
     }
 
-    public static List<Employee> generateEmployee(int count, List<Employee> list) {
-        Random random = new Random();
-        for (int i = 0; i < count; i++) {
-            Employee employee = new Employee(i, "Hello" + i, random.nextInt(100, 100_000));
-            list.add(employee);
-        }
-
-        return list;
-    }
 
     public static List<Employee> filterEmployee(int filter, List<Employee> list) {
         list.removeIf(employee -> employee.salary > filter);
@@ -55,6 +66,14 @@ public class ArrayListPerformance2 {
             this.id = id;
             this.name = name;
             this.salary = salary;
+        }
+    }
+
+    static class SalaryComparator implements Comparator<Employee> {
+
+        @Override
+        public int compare(Employee o1, Employee o2) {
+            return o1.salary - o2.salary;
         }
     }
 

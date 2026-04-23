@@ -84,6 +84,8 @@ public class ArrayListPerformance {
         System.out.println("LL With counter " + counter + " Time taken " + (end2 - start2));
     }
 
+
+
     /*
     Result for add(insertLocation,"Hello")
         Array List time approx 51k, 54k, 42k, 42k
