@@ -26,7 +26,6 @@ public class A_StreamPractice {
     record Employee(String name, String dept, double salary) {
     }
 
-    
 
     static {
         Random random = new Random();
@@ -82,15 +81,15 @@ public class A_StreamPractice {
                 case 2 -> squareOfNumbers();
                 case 3 -> namesStartingWithA();
                 case 4 -> convertToUppercase();
-                case 5 -> countOfNumbersGreaterThan10();
-                case 6 -> removeDuplicatesAndSort();
-                case 7 -> topThreeHighest();
-                case 8 -> skipAndSum();
-                case 9 -> findMax();
-                case 10 -> productOfElements();
+                case 5 -> countOfNumbersGreaterThan10();        //*
+                case 6 -> removeDuplicatesAndSort();            //*
+                case 7 -> topThreeHighest();                    //*
+                case 8 -> skipFiveAndSum();                     //**
+                case 9 -> findMax();                            //*
+                case 10 -> productOfElements();                 //*
                 case 11 -> getEmployeeNames();
                 case 12 -> findEmployeesInDept();
-                case 13 -> findEmployeeWithHighestSalary();
+                case 13 -> findEmployeeWithHighestSalary();     //**
                 case 14 -> averageSalaryInDept();
                 case 15 -> groupByDepartment();
                 case 16 -> totalSalaryPerDept();
@@ -148,7 +147,7 @@ public class A_StreamPractice {
         System.out.printf("Uppercase: %s%n", upper);
     }
 
-    // 5️⃣ Find the count of number greater than 10
+    // 5️⃣ *Find the count of number greater than 10
     public static void countOfNumbersGreaterThan10() {
         List<Integer> numbers = List.of(5, 10, 15, 20, 25);
         long count = numbers.stream()
@@ -179,7 +178,7 @@ public class A_StreamPractice {
     }
 
     // 8️⃣ Skip first 5 and add
-    public static void skipAndSum() {
+    public static void skipFiveAndSum() {
         int sum = IntStream.rangeClosed(1, 10)
                 .skip(5)
                 .sum();
@@ -200,6 +199,16 @@ public class A_StreamPractice {
                 .reduce(Integer::max)
                 .orElse(-1);
         System.out.printf("Max value: %s%n", max);
+
+        var x = numbers.stream()
+                .mapToInt(value -> value)
+                .max()
+                .orElse(-1);
+        System.out.println(x);
+
+        x = numbers.stream()
+                .reduce(-1, (integer, integer2) -> ((integer - integer2) > 0) ? integer : integer2);
+        System.out.println(x);
     }
 
     // 🔟 Reduce (product)
@@ -208,6 +217,14 @@ public class A_StreamPractice {
         int product = numbers.stream()
                 .reduce(1, (a, b) -> a * b);
         System.out.printf("Product: %s%n", product);
+
+        List<Integer> integers = List.of(4, 8, 26, 8, 5, 98, 56, 8, 32, 11, 9, 4, 77, 7, 3, 2, 5, 5, 3, 2, 1);
+
+        var x = integers.stream()
+                //Since it may go out of range
+                .mapToDouble(value -> value)
+                .reduce((integer, integer2) -> integer * integer2);
+        System.out.println(x);
     }
 
     // Object use case using Employee object
@@ -234,6 +251,21 @@ public class A_StreamPractice {
                 .max(Comparator.comparing(Employee::salary))
                 .orElse(null);
         System.out.printf("Highest Salary: %s%n", max);
+
+        var x = employees.stream()
+                .max((o1, o2) -> Double.compare(o1.salary, o2.salary))
+                .orElse(null);
+        System.out.println(x);
+
+        x = employees.stream()
+                .max(Comparator.comparingDouble(Employee::salary))
+                .orElse(null);
+        System.out.println(x);
+
+        x = employees.stream()
+                .reduce((employee, employee2) -> (employee.salary() > employee2.salary()) ? employee : employee2)
+                .orElse(null);
+        System.out.println(x);
     }
 
     // 14️⃣ Average Department 3 salary
@@ -354,7 +386,7 @@ public class A_StreamPractice {
         sorted = map
                 .entrySet()
                 .stream()
-                .sorted((o1, o2) -> o1.getValue()-o2.getValue()) //Ascending
+                .sorted((o1, o2) -> o1.getValue() - o2.getValue()) //Ascending
                 //.sorted((o1, o2) -> o2.getValue()-o1.getValue()) //Descending
                 .collect(Collectors.toMap(
                         o -> o.getKey(),

@@ -23,7 +23,7 @@ public class A_LiteralsPrimitives {
     public static void initialization() {
         int i, j = 8;
         System.out.println("j" + j);  //can't use i as it is uninitialized
-        Test t = new Test();  // All the variable  of Test class get initialized to default values
+        ClassWithPrimitives t = new ClassWithPrimitives();  // All the variable  of Test class get initialized to default values
         System.out.println(t.toString());
     }
 
@@ -114,7 +114,7 @@ public class A_LiteralsPrimitives {
     }
 
 
-    static class Test {
+    static class ClassWithPrimitives {
         int i;
         boolean b;
         float f;
