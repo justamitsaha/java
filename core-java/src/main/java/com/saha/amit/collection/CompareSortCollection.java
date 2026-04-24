@@ -2,6 +2,11 @@ package com.saha.amit.collection;
 
 import java.util.*;
 
+/*
+This class sorts the list of movies based on their rating and earnings.
+1. We will be using the Comparable interface to sort the movies based on their rating, natural order
+2. we will be using the Comparator interface to sort the movies based on their earnings.
+ */
 public class CompareSortCollection {
     static class Movies implements Comparable<Movies> {
         String id;
@@ -18,7 +23,7 @@ public class CompareSortCollection {
 
         @Override
         public String toString() {
-            return "Movies{id='" + id + '\'' + ", name='" + name + "}";
+            return "{" + id + "." + name + ", rating='" + rating + ", earnings='" + earnings + "}/\n";
         }
 
 
@@ -31,11 +36,11 @@ public class CompareSortCollection {
 
     public static void main(String[] args) {
         var movies = generateMoviesList();
-        System.out.println(movies);
+        System.out.println("Unsorted Movie List->\n" + movies);
         Collections.sort(movies);
-        System.out.println(movies);
+        System.out.println("Sorted movie list based on rating->\n" + movies);
         Collections.sort(movies, new EarningComparator());
-        System.out.println(movies);
+        System.out.println("Sorted movie list based on earning->\n" + movies);
     }
 
     public static List<Movies> generateMoviesList() {

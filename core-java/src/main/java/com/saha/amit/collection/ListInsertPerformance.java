@@ -2,11 +2,16 @@ package com.saha.amit.collection;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 
-public class ArrayListPerformance {
+/*
+    This class is to compare the performance of add operation in ArrayList and LinkedList
+    We will be adding to middle, first and last and see the performance difference
+    While we add to middle or beginning, LinkedList should outperform ArrayList as it doesn't require shifting of elements, but when we add to end, ArrayList should outperform LinkedList as it has better cache locality and less overhead.
+    But the performance difference may not be linear as it also depends on the size of the list and the number of operations we perform, as well as the JVM optimizations and garbage collection.
+ */
+public class ListInsertPerformance {
 
     public static ArrayList<String> arrayList = new ArrayList<>();
     public static LinkedList<String> linkedList = new LinkedList<>();
