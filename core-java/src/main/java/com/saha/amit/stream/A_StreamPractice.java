@@ -2,6 +2,7 @@ package com.saha.amit.stream;
 
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -90,9 +91,9 @@ public class A_StreamPractice {
                 case 11 -> getEmployeeNames();
                 case 12 -> findEmployeesInDept();
                 case 13 -> findEmployeeWithHighestSalary();     //**
-                case 14 -> averageSalaryInDept();
-                case 15 -> groupByDepartment();
-                case 16 -> totalSalaryPerDept();
+                case 14 -> averageSalaryInDept();               //*
+                case 15 -> groupByDepartment();                 //***
+                case 16 -> totalSalaryPerDept();                //****
                 case 17 -> wordFrequency();
                 case 18 -> flattenList();
                 case 19 -> uniqueCharactersFromWords();
@@ -276,6 +277,16 @@ public class A_StreamPractice {
                 .average()
                 .orElse(0);
         System.out.printf("Average Department 3 salary: %s%n", avg);
+
+        AtomicInteger atomicInteger = new AtomicInteger(0);
+        var x = employees.stream()
+                .filter(employee -> employee.dept.equals("3"))
+                .map(employee -> {
+                    atomicInteger.incrementAndGet();
+                    return employee.salary;
+                }).reduce(0d, (aDouble, aDouble2) -> aDouble + aDouble2);
+
+        System.out.println(x / atomicInteger.doubleValue());
     }
 
     // 15️⃣ Grouping by department
