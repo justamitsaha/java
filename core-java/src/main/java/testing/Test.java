@@ -31,19 +31,30 @@ public class Test {
 
     }
 
+    /*
+    So we know the grouping by Creates Map ad the format is
+    stream().collect(Collectors.groupingBy(function(), Collectors))
+    function determine the key
+    The 2nd Collectors determine how to create the Values of Map, if its original item then we don;t need it, other wise se we have to create the values with another collector
+     */
     public static void main(String[] args) {
         Map<String, List<Employee>> map = employees.stream()
                 .collect(Collectors.groupingBy(Employee::dept));
-
         System.out.println(map);
 
-        Map<String,Double> doubleMap = employees.stream()
-                .collect(Collectors.groupingBy(Employee::dept,Collectors.summingDouble(Employee::salary)));
-        System.out.println(doubleMap);
+        var x = employees.stream()
+                .collect(Collectors.groupingBy(Employee::dept, Collectors.counting()));
+        System.out.println(x);
 
-        Map<String,Double> doubleMap1 = employees.stream()
-                .collect(Collectors.groupingBy(Employee::dept, Collectors.averagingDouble(Employee::salary)));
-        System.out.println(doubleMap1);
+        var y = employees.stream()
+                .collect(Collectors.groupingBy(Employee::dept, Collectors.summingDouble(Employee::salary)));
+        System.out.println(y);
+
+        var z = employees.stream()
+                .collect(Collectors.groupingBy(Employee::dept,Collectors.averagingDouble(Employee::salary)));
+        System.out.println(z);
+
+
     }
 }
 
