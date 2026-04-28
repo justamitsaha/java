@@ -63,7 +63,8 @@ public class GroupingOperations {
 
     static List<String> words = List.of("apple", "ant", "banana", "ball", "ball", "cat", "car", "cat", "dog", "doll");
 
-    record Product(String name, String category, double price) {}
+    record Product(String name, String category, double price) {
+    }
 
     static List<Product> products = List.of(
             new Product("Laptop", "Electronics", 70000),
@@ -72,6 +73,18 @@ public class GroupingOperations {
             new Product("Jeans", "Clothing", 3000),
             new Product("Book1", "Books", 500),
             new Product("Book2", "Books", 800)
+    );
+
+    record Employee(String name, String dept, int age, int salary) {
+    }
+
+    static List<Employee> employees = List.of(
+            new Employee("A", "IT", 25, 50000),
+            new Employee("B", "IT", 30, 70000),
+            new Employee("C", "HR", 25, 40000),
+            new Employee("D", "HR", 30, 60000),
+            new Employee("E", "IT", 25, 55000)
+
     );
 
 
@@ -91,8 +104,10 @@ public class GroupingOperations {
             case 7 -> studentNamesPipeSeparatedPerDepartment();
             case 8 -> studentWithHighestMarksPerDept();
             case 9 -> removeDuplicateWords();
-            case 10-> studentsNameCommaSeparatedGroupedByDepartment();
-            case 11-> productSummaryStatisticsGroupedByCategory();
+            case 10 -> studentsNameCommaSeparatedGroupedByDepartment();
+            case 11 -> productSummaryStatisticsGroupedByCategory();
+            case 12 -> groupEmployeeByDepartmentAge();
+            case 13 -> avgSalaryGroupEmployeeByDepartmentAge();
             default -> System.out.println("Invalid Choice");
         }
     }
@@ -248,7 +263,59 @@ public class GroupingOperations {
     /**
      * 11 Product statistics grouped by Category
      */
-    public static void productSummaryStatisticsGroupedByCategory(){
+    public static void productSummaryStatisticsGroupedByCategory() {
+        Map<String, DoubleSummaryStatistics> map = products.stream()
+                .collect(Collectors.groupingBy(
+                        Product::category,
+                        Collectors.mapping(
+                                Product::price,
+                                Collectors.summarizingDouble(value -> value)
+                        )
+                ));
+
+        System.out.println(map);
+    }
+
+    /**
+     * 12 Group Employee by Department and Age
+     */
+    public static void groupEmployeeByDepartmentAge() {
+        Map<String, Map<Integer, List<Employee>>> map = employees.stream()
+                .collect(Collectors.groupingBy(
+                        Employee::dept,
+                        Collectors.groupingBy(
+                                Employee::age
+                        )
+                ));
+
+        System.out.println(map);
+    }
+
+    /**
+     * 13 Find max Salary in per age department, per age
+     */
+    public static void avgSalaryGroupEmployeeByDepartmentAge() {
+        Map<String, Map<Integer, Integer>> map = employees.stream()
+                .collect(Collectors.groupingBy(
+                        Employee::dept,
+                        Collectors.groupingBy(
+                                Employee::age,
+                                Collectors.mapping(
+                                        Employee::salary,
+                                        Collectors.collectingAndThen(
+                                                Collectors.maxBy((o1, o2) -> o1 - o1),
+                                                integer -> integer.get()
+                                        )
+                                )
+                        )
+                ));
+        System.out.println(map);
+    }
+
+    /**
+     * 14 Find Employees in rage higher than 60k or lower than 60k
+     */
+    public static void test(){
 
     }
 
