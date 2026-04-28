@@ -1,9 +1,6 @@
 package testing;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /*
@@ -64,6 +61,19 @@ public class GroupingOperations {
             new Student("Karan", "ECE", 60)
     );
 
+    static List<String> words = List.of("apple", "ant", "banana", "ball", "ball", "cat", "car", "cat", "dog", "doll");
+
+    record Product(String name, String category, double price) {}
+
+    static List<Product> products = List.of(
+            new Product("Laptop", "Electronics", 70000),
+            new Product("Phone", "Electronics", 30000),
+            new Product("Shirt", "Clothing", 2000),
+            new Product("Jeans", "Clothing", 3000),
+            new Product("Book1", "Books", 500),
+            new Product("Book2", "Books", 800)
+    );
+
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -80,6 +90,9 @@ public class GroupingOperations {
             case 6 -> concatenatedStudentNamesPerDepartment();
             case 7 -> studentNamesPipeSeparatedPerDepartment();
             case 8 -> studentWithHighestMarksPerDept();
+            case 9 -> removeDuplicateWords();
+            case 10-> studentsNameCommaSeparatedGroupedByDepartment();
+            case 11-> productSummaryStatisticsGroupedByCategory();
             default -> System.out.println("Invalid Choice");
         }
     }
@@ -94,9 +107,7 @@ public class GroupingOperations {
     }
 
     /**
-     * 2
-     * Group by category
-     * Count number of orders per category
+     * 2 Group by category and Count number of orders per category
      **/
     public static void countOfOrdersPerCategory() {
         Map<String, Long> map = orders.stream()
@@ -108,9 +119,7 @@ public class GroupingOperations {
     }
 
     /**
-     * 3
-     * Group by category
-     * Calculate total revenue per category
+     * 3 Group by category Calculate total revenue per category
      */
     public static void totalRevenuePerCategory() {
         Map<String, Double> map = orders.stream()
@@ -122,9 +131,7 @@ public class GroupingOperations {
     }
 
     /**
-     * 4
-     * Group by category
-     * Find average order amount per category
+     * 4 Group by category Find average order amount per category
      */
     public static void averageOrderAmountPerCategory() {
         Map<String, Double> map = orders.stream()
@@ -136,8 +143,7 @@ public class GroupingOperations {
     }
 
     /**
-     * 5
-     * List of Students names per category
+     * 5 List of Students names per category
      */
     public static void listOfStudentNamesPerDepartment() {
         Map<String, List<String>> map = students.stream()
@@ -152,8 +158,7 @@ public class GroupingOperations {
     }
 
     /**
-     * 6
-     * Students names concatenated per category eg. IT=NehaPooja
+     * 6 Students names concatenated per category eg. IT=NehaPooja
      */
     public static void concatenatedStudentNamesPerDepartment() {
         Map<String, String> map = students.stream()
@@ -168,8 +173,7 @@ public class GroupingOperations {
     }
 
     /**
-     * 7
-     * Students names concatenated with | per category eg. IT=Neha | Pooja
+     * 7 Students names concatenated with | per category eg. IT=Neha | Pooja
      */
     public static void studentNamesPipeSeparatedPerDepartment() {
         Map<String, String> map = students.stream()
@@ -194,6 +198,9 @@ public class GroupingOperations {
         System.out.println(map1);
     }
 
+    /**
+     * 8 Students with highest per department
+     */
     public static void studentWithHighestMarksPerDept() {
         Map<String, Optional<Student>> map = students.stream()
                 .collect(Collectors.groupingBy(
@@ -208,6 +215,41 @@ public class GroupingOperations {
                         Collectors.reducing(null, (student, student2) -> student.marks > student2.marks ? student : student2)
                 ));
         System.out.println(map1);
+    }
+
+    /**
+     * 9 Group words with fist letter and remove duplicates
+     */
+    public static void removeDuplicateWords() {
+        Map<Character, Set<String>> map = words.stream()
+                .collect(Collectors.groupingBy(
+                        o -> o.charAt(0),
+                        Collectors.toSet()
+                ));
+        System.out.println(map);
+    }
+
+    /**
+     * 10 Group students by departments and display names comma separtated
+     */
+    public static void studentsNameCommaSeparatedGroupedByDepartment() {
+        Map<String, String> map = students.stream()
+                .collect(Collectors.groupingBy(
+                        Student::dept,
+                        Collectors.mapping(
+                                Student::name,
+                                Collectors.joining(",")
+                        )
+                ));
+
+        System.out.println(map);
+    }
+
+    /**
+     * 11 Product statistics grouped by Category
+     */
+    public static void productSummaryStatisticsGroupedByCategory(){
+
     }
 
 
