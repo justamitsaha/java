@@ -1,4 +1,4 @@
-package testing;
+package com.saha.amit.stream;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -271,10 +271,7 @@ public class GroupingOperations {
         Map<String, DoubleSummaryStatistics> map = products.stream()
                 .collect(Collectors.groupingBy(
                         Product::category,
-                        Collectors.mapping(
-                                Product::price,
-                                Collectors.summarizingDouble(value -> value)
-                        )
+                        Collectors.summarizingDouble(Product::price)
                 ));
 
         System.out.println(map);
@@ -296,21 +293,15 @@ public class GroupingOperations {
     }
 
     /**
-     * 13 Find max Salary in per age department, per age
+     * 13 Find average Salary in per age department, per age
      */
     public static void avgSalaryGroupEmployeeByDepartmentAge() {
-        Map<String, Map<Integer, Integer>> map = employees.stream()
+        Map<String, Map<Integer, Double>> map = employees.stream()
                 .collect(Collectors.groupingBy(
                         Employee::dept,
                         Collectors.groupingBy(
                                 Employee::age,
-                                Collectors.mapping(
-                                        Employee::salary,
-                                        Collectors.collectingAndThen(
-                                                Collectors.maxBy((o1, o2) -> o1 - o1),
-                                                integer -> integer.get()
-                                        )
-                                )
+                                Collectors.averagingInt(Employee::salary)
                         )
                 ));
         System.out.println(map);
@@ -327,6 +318,10 @@ public class GroupingOperations {
                         Collectors.toList()
                 ));
         System.out.println(map);
+
+        Map<Boolean, List<Employee>> map1 = employees.stream()
+                .collect(Collectors.partitioningBy(employee -> employee.salary > range));
+        System.out.println(map1);
     }
 
     /**
@@ -342,8 +337,41 @@ public class GroupingOperations {
                                 Collectors.joining(",")
                         )
                 ));
-
         System.out.println(map);
+
+        /*
+            While sorting the entire stream works, it is often less efficient for very large datasets
+            If you have 1,000,000 employees, .sorted() compares all 1,000,000 records against each other ($O(N \log N)$).
+            If those 1,000,000 employees are split into 1,000 departments, you are performing 1,000 smaller sorts.
+            Sorting many small lists is generally faster and uses memory more efficiently than sorting one massive list.
+         */
+        Map<String, String> map1 = employees.stream()
+                .collect(Collectors.groupingBy(
+                        Employee::dept,
+                        Collectors.collectingAndThen(
+                                Collectors.mapping(Employee::name, Collectors.toList()),
+                                names -> {
+                                    Collections.sort(names); // Sort the small list
+                                    return String.join(",", names);
+                                }
+                        )
+                ));
+        System.out.println(map1);
+
+        //If you don’t have duplicate names within a department (or don't mind duplicates being removed), you can use a TreeSet
+        Map<String, String> map2 = employees.stream()
+                .collect(Collectors.groupingBy(
+                        Employee::dept,
+                        Collectors.mapping(
+                                Employee::name,
+                                Collectors.collectingAndThen(
+                                        Collectors.toCollection(TreeSet::new),
+                                        set -> String.join(",", set)
+                                )
+                        )
+                ));
+        System.out.println(map2);
+
     }
 
     /**
@@ -365,10 +393,37 @@ public class GroupingOperations {
                 .sorted(Comparator.comparingInt(Employee::salary))
                 .collect(Collectors.groupingBy(
                         Employee::dept,
-                        Collectors.toList()
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                employees1 -> {
+                                    employees1.sort(Comparator.comparingInt(Employee::salary));
+                                    //List.reversed() returns a reverse view, use employees1.sort(Comparator.comparingInt(Employee::salary).reversed());
+                                    employees1 = employees1.reversed();
+                                    List<Employee> employees2 = new ArrayList<>();
+                                    //if (null != employees1) useless null check Impossible Collectors.toList() always returns non-null list.
+                                    if (null != employees1 && !employees1.isEmpty())
+                                        employees2.add(employees1.get(0));
+                                    if (employees1.size() > 1)
+                                        employees2.add(employees1.get(1));
+                                    return employees2;
+                                }
+                        )
                 ));
-
         System.out.println(map);
+
+        //Better Solution less verbose more clear operation no manual index operation
+        Map<String, List<Employee>> map2 = employees.stream()
+                .collect(Collectors.groupingBy(
+                        Employee::dept,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                list -> list.stream()
+                                        .sorted(Comparator.comparingInt(Employee::salary).reversed())
+                                        .limit(2)
+                                        .toList()
+                        )
+                ));
+        System.out.println(map2);
     }
 
 
