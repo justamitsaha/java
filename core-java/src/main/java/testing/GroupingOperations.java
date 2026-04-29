@@ -79,8 +79,8 @@ public class GroupingOperations {
     }
 
     static List<Employee> employees = List.of(
-            new Employee("A", "IT", 25, 50000),
             new Employee("B", "IT", 30, 70000),
+            new Employee("A", "IT", 25, 50000),
             new Employee("C", "HR", 25, 40000),
             new Employee("D", "HR", 30, 60000),
             new Employee("E", "IT", 25, 55000)
@@ -108,6 +108,10 @@ public class GroupingOperations {
             case 11 -> productSummaryStatisticsGroupedByCategory();
             case 12 -> groupEmployeeByDepartmentAge();
             case 13 -> avgSalaryGroupEmployeeByDepartmentAge();
+            case 14 -> groupEmployeesInRangedBasedGroup();
+            case 15 -> sortEmployeeNamesGroupByDepartment();
+            case 16 -> groupEmployeeBySeniority();
+            case 17 -> topTwoSalariedEmployeePerDepartment();
             default -> System.out.println("Invalid Choice");
         }
     }
@@ -315,8 +319,56 @@ public class GroupingOperations {
     /**
      * 14 Find Employees in rage higher than 60k or lower than 60k
      */
-    public static void test(){
+    public static void groupEmployeesInRangedBasedGroup() {
+        int range = 60_000;
+        Map<Boolean, List<Employee>> map = employees.stream()
+                .collect(Collectors.groupingBy(
+                        employee -> employee.salary > range,
+                        Collectors.toList()
+                ));
+        System.out.println(map);
+    }
 
+    /**
+     * 15
+     */
+    public static void sortEmployeeNamesGroupByDepartment() {
+        Map<String, String> map = employees.stream()
+                .sorted((o1, o2) -> o1.name.compareTo(o2.name))
+                .collect(Collectors.groupingBy(
+                        Employee::dept,
+                        Collectors.mapping(
+                                Employee::name,
+                                Collectors.joining(",")
+                        )
+                ));
+
+        System.out.println(map);
+    }
+
+    /**
+     * 16  Group employees into: "Young" (<30), "Mid" (30–40), "Senior" (>40)
+     */
+    public static void groupEmployeeBySeniority() {
+        Map<String, List<Employee>> map = employees.stream()
+                .collect(Collectors.groupingBy(
+                        employee -> employee.age < 30 ? "Young" : employee.age < 40 ? "Mid" : "Senior"
+                ));
+        System.out.println(map);
+    }
+
+    /**
+     * 17
+     */
+    public static void topTwoSalariedEmployeePerDepartment() {
+        Map<String, List<Employee>> map = employees.stream()
+                .sorted(Comparator.comparingInt(Employee::salary))
+                .collect(Collectors.groupingBy(
+                        Employee::dept,
+                        Collectors.toList()
+                ));
+
+        System.out.println(map);
     }
 
 
