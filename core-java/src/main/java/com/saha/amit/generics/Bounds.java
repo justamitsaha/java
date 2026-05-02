@@ -21,6 +21,8 @@ public class Bounds {
         //noReturn3(List.of(2,4));
     }
 
+    //💚💚💚💚💚💚💚  No return type Object input 💚💚💚💚💚💚💚
+
     // Here T is necessary because we want to refer to the specific type of Number that was passed in, and we want to perform type-specific logic based on that type.
     // We can't use ? here because ?: Used for parameter types (e.g., List<? extends Number>), not for declaring the parameter variable itself.
     private static <T extends Number> void noReturn(T t) {
@@ -32,6 +34,8 @@ public class Bounds {
             System.out.println("Other Number: " + t);
         }
     }
+
+    //💚💚💚💚💚💚💚  No return type Parameterized  input  like List<> 💚💚💚💚💚💚💚
 
     // ❌ Here T is unnecessary and not required as it's not linking to anything or doing anything
     public static <T> void noReturn1(List<? extends Number> list) {
@@ -47,7 +51,7 @@ public class Bounds {
         }
     }
 
-    // T is now bound: it must be a Number, and the List MUST contain T objects.
+    // ✅T is now bound: it must be a Number, and the List MUST contain T objects.
     // Use when the type T needs to be "remembered" for returns, logic, or multiple arguments.
     public static <T extends Number> void noReturn3(List<T> list) {
         for (T element : list) {
@@ -62,13 +66,15 @@ public class Bounds {
         }
     }
 
-     //We use T so the return type matches the list's specific type
-     public  static <T extends Number> T returnValue(List<T> list) {
-        Integer i =3;
-        return i;
-     }
+    //💚💚💚💚💚💚💚  Return along with input 💚💚💚💚💚💚💚
 
-    // We use T so the return type matches the list's specific type
+    //✅We use T so the return type matches the list's specific type
+    public static <T extends Number> T returnValue(List<T> list) {
+        return list.getLast();
+    }
+
+    // ❌ The "Broken" Relationship, Inout and Out put are not linked so if we try to return value from input
+    //Compiler treats it as ?  doesn't consider it of type T
     public static <T extends Number> T returnValue2(List<? extends Number> list) {
         return null;
     }

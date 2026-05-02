@@ -1,24 +1,23 @@
 package com.saha.amit.generics;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
+
 
 public class GenericClass {
     static class Box<T> {
         T t;
 
-        public T getT() {
+        private T getT() {
             return t;
         }
 
-        public void setT(T t) {
+        private void setT(T t) {
             this.t = t;
         }
 
-        public boolean isEmpty() {
+        private boolean isEmpty() {
             return null == t;
         }
     }
@@ -38,7 +37,7 @@ public class GenericClass {
         String dept;
         int salary;
 
-        public Employee(String id, String dept, int salary) {
+        private Employee(String id, String dept, int salary) {
             this.id = id;
             this.dept = dept;
             this.salary = salary;
@@ -50,7 +49,7 @@ public class GenericClass {
         private final B b;
         private final C c;
 
-        public Triple(A a, B b, C c) {
+        private Triple(A a, B b, C c) {
             this.a = a;
             this.b = b;
             this.c = c;
@@ -63,16 +62,16 @@ public class GenericClass {
     }
 
     static class GenericMethods {
-        public static <T> void print(T t) {
+        private static <T> void print(T t) {
             if (null != t)
                 System.out.println(t.toString());
         }
 
-        public static <T> T findFirst(List<T> list) {
+        private static <T> T findFirst(List<T> list) {
             return list.isEmpty() ? null : list.getFirst();
         }
 
-        public static <T> List<T> swap(List<T> t, int i, int j) {
+        private static <T> List<T> swap(List<T> t, int i, int j) {
             if (null != t && t.size() > Integer.max(i, j)) {
                 T temp = t.get(j);
                 t.set(j, t.get(i));
@@ -81,13 +80,52 @@ public class GenericClass {
             return t;
         }
 
-        public static <T extends Number> Double sum(List<T> list) {
+        private static <T extends Number> Double sum(List<T> list) {
             double d = 0d;
             for (T t : list) {
                 d = d + t.doubleValue();
             }
             return d;
         }
+
+        private static <T extends Comparable<T>> T max(List<T> list) {
+            if (null == list || list.isEmpty())
+                throw new UnsupportedOperationException();
+            /* Instead of sorting, you should iterate through the list to find the maximum. This is also much faster ($O(n)$ instead of $O(n \log n)$).
+            list.sort(Comparable::compareTo);
+            return list.getLast();
+            */
+
+            T max = list.getFirst();
+            for (T element : list) {
+                if (element.compareTo(max) > 0) {
+                    max = element;
+                }
+            }
+            return max;
+        }
+
+
+        private static <T extends Number> T max2(List<T> list) {
+            if (null == list || list.isEmpty())
+                throw new UnsupportedOperationException();
+
+            return list.stream().max(Comparator.comparingDouble(Number::doubleValue)).orElse(null);
+
+        }
+
+        private static <T extends Number> T min(List<T> list) {
+            if (null == list || list.isEmpty())
+                throw new UnsupportedOperationException();
+            return list.stream().min(Comparator.comparingDouble((Number o) -> o.doubleValue())).orElse(null);
+        }
+
+        private static Double avergae(List<? extends Number> list) {
+            if (null == list || list.isEmpty())
+                throw new UnsupportedOperationException();
+            return list.stream().collect(Collectors.averagingDouble(Number::doubleValue));
+        }
+
 
 
     }
@@ -129,7 +167,30 @@ public class GenericClass {
                 List<String> strings1 = null;
                 System.out.println(GenericMethods.swap(integers, 1, 3));
                 System.out.println(GenericMethods.swap(strings, 1, 3));
-                System.out.println(GenericMethods.swap(strings, 0, 0));
+                System.out.println(GenericMethods.swap(strings1, 0, 0));
+            }
+            case 7 -> {
+                List<Integer> integers = List.of(1, 4, 8, 6);
+                List<Float> floats = List.of(1.4f, 7.9f);
+                List<String> strings = List.of("Ab", "Cd");
+                System.out.println(GenericMethods.sum(integers));
+                System.out.println(GenericMethods.sum(floats));
+            }
+            case 8 -> {
+                List<String> strings = Arrays.asList("SAM", "BAM", "TAM");
+                System.out.println(GenericMethods.max(strings));
+                List<Integer> integers = Arrays.asList(1, 4, 8, 6);
+                System.out.println(GenericMethods.max(integers));
+                List<Float> floats = Arrays.asList(1.4f, 7.9f);
+                System.out.println(GenericMethods.max(floats));
+                List<Employee> employees = Arrays.asList(new Employee("1", "IT", 45000), new Employee("2", "HR", 50_000));
+                //System.out.println(GenericMethods.max(employees));  //Won't compile
+            }
+            case 9 -> {
+                List<Integer> integers = Arrays.asList(1, 4, 8, 6);
+                System.out.println(GenericMethods.max2(integers));
+                System.out.println(GenericMethods.min(integers));
+                System.out.println(GenericMethods.avergae(integers));
             }
             default -> System.out.println("Invalid Choice");
         }
