@@ -2,7 +2,7 @@ package com.saha.amit.generics;
 
 import java.util.List;
 
-public class Bounds {
+public class UpperBounds {
 
     public static void main(String[] args) {
         noReturn(1.1f);
@@ -21,10 +21,21 @@ public class Bounds {
         //noReturn3(List.of(2,4));
     }
 
-    //💚💚💚💚💚💚💚  No return type Object input 💚💚💚💚💚💚💚
+    //1. ⭐⭐No return type Object input
 
-    // Here T is necessary because we want to refer to the specific type of Number that was passed in, and we want to perform type-specific logic based on that type.
-    // We can't use ? here because ?: Used for parameter types (e.g., List<? extends Number>), not for declaring the parameter variable itself.
+    /* =========================================================
+       1. SINGLE BOUND (The Basics)
+       =========================================================
+    */
+
+    // Bound on a single object: Useful for internal logic/instanceof.
+    public static <T extends Number> void singleObject(T item) {
+        System.out.println(item.doubleValue());
+    }
+
+
+    // Compiler won't know what is T so we have to define the type of T in method signature so that it can be used inside the method body
+    // Can't user noReturn(<? extends Number> t) as its not part of parameter like noReturn(List<? extends Number> list)
     private static <T extends Number> void noReturn(T t) {
         if (t instanceof Float) {
             System.out.println("Float: " + t);
@@ -35,7 +46,8 @@ public class Bounds {
         }
     }
 
-    //💚💚💚💚💚💚💚  No return type Parameterized  input  like List<> 💚💚💚💚💚💚💚
+
+    //2. ⭐⭐  No return type Parameterized  input  like List<>
 
     // ❌ Here T is unnecessary and not required as it's not linking to anything or doing anything
     public static <T> void noReturn1(List<? extends Number> list) {
@@ -66,18 +78,14 @@ public class Bounds {
         }
     }
 
-    //💚💚💚💚💚💚💚  Return along with input 💚💚💚💚💚💚💚
+    //3. ⭐⭐ Return along with input
 
     //✅We use T so the return type matches the list's specific type
     public static <T extends Number> T returnValue(List<T> list) {
         return list.getLast();
     }
 
-    // ❌ The "Broken" Relationship, Inout and Out put are not linked so if we try to return value from input
-    //Compiler treats it as ?  doesn't consider it of type T
-    public static <T extends Number> T returnValue2(List<? extends Number> list) {
-        return null;
-    }
+
 
 
 }

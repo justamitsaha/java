@@ -126,6 +126,9 @@ public class GenericClass {
             return list.stream().collect(Collectors.averagingDouble(Number::doubleValue));
         }
 
+        private static void sumUpper(List<? super Integer> list){
+
+        }
 
 
     }
@@ -191,6 +194,9 @@ public class GenericClass {
                 System.out.println(GenericMethods.max2(integers));
                 System.out.println(GenericMethods.min(integers));
                 System.out.println(GenericMethods.avergae(integers));
+            }
+            case 10 -> {
+
             }
             default -> System.out.println("Invalid Choice");
         }
