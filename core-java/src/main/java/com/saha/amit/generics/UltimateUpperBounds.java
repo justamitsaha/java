@@ -10,18 +10,27 @@ import java.util.List;
 public class UltimateUpperBounds {
 
     public static void main(String[] args) {
+        // 1. Single Object Input
+        noReturn(42.5f);
+
+        // 2. Wildcard Input (Anonymous/Read-only)
         noReturnListInput(List.of(1, 2, 3));
-        System.out.println("--- 1. Multiple Bounds ---");
+
+        // 3. Recursive Bound (Comparable)
+        List<String> names = List.of("Zebra", "Apple", "Mango");
+        System.out.println("Max Name: " + findMax(names));
+
+        // 4. Named T with Type-Specific Logic
+        // Note: Using List<Number> here so T becomes Number
+        noReturn3(List.of(1, 2, 3, 4.5f, 5.5));
+
+        // 5. Multiple Bounds (Intersection)
         handleMultiBound(10); // Integer is a Number & Comparable
 
-        System.out.println("\n--- 2. Recursive Bounds ---");
-        List<String> names = List.of("Zebra", "Apple", "Mango");
-        System.out.println("Max: " + findMax(names));
-
-        System.out.println("\n--- 3. Multiple Types ---");
+        // 6. Multiple Type Parameters
         combine(10, 20.5);
 
-        System.out.println("\n--- 4. Nested Bounds ---");
+        // 7. Nested Bounds
         List<List<Integer>> matrix = List.of(List.of(1, 2), List.of(3, 4));
         processMatrix(matrix);
     }
@@ -31,30 +40,40 @@ public class UltimateUpperBounds {
        =========================================================
     */
 
-    // Compiler won't know what is T so we have to define the type of T in method signature so that it can be used inside the method body
-    // Can't user singleObject(<? extends Number> t) This can be used only for parameterized obj like singleObject(List<? extends Number> list)
+    /**
+     * Compiler needs the <T> declaration to use it in the method body.
+     * We cannot use (<? extends Number> t) for a single object parameter.
+     */
     public static <T extends Number> void noReturn(T item) {
-        System.out.println(item.doubleValue());
+        // We can use Number methods on T because we know T is a subtype of Number.
+        if (item instanceof Integer) {
+            System.out.println("Integer detected: " + item.intValue());
+        } else if (item instanceof Double) {
+            System.out.println("Double detected: " + item.doubleValue());
+        } else {
+            System.out.println("Other Number type: " + item);
+        }
     }
 
-    // Bound on a Parameterized Type (Wildcard): Best for "Read-Only" access.
-    // Idiomatic: Use this when you don't need to read data(e.g. var x = list) or return T or link it to other params.
+    /**
+     * Bound on a Parameterized Type (Wildcard): Best for "Read-Only" access.
+     * Use this when you don't need to return T or link it to other parameters.
+     */
     public static void noReturnListInput(List<? extends Number> list) {
-        // Compiler treats this as ? extends Number, so we can only assign it to a Number reference, not T.
-        var x = list.getFirst();
-        System.out.println("Type -->"+(x instanceof Number));
+        // list.getFirst() returns 'capture of ? extends Number'
         Number n = list.getFirst();
+        System.out.println("Read from wildcard list: " + n + " (Is Number: " + (n instanceof Number) + ")");
     }
 
 
     /* =========================================================
-       2. ⭐⭐RECURSIVE BOUNDS (Self-Referential)
+       2. ⭐⭐ RECURSIVE BOUNDS (Self-Referential)
        =========================================================
     */
 
     /**
      * This ensures T is comparable to itself.
-     * Use when the type T needs to be "remembered" for returns, logic, or linking to inputs parameters.
+     * Use when the type T needs to be "remembered" for returns or linking.
      */
     public static <T extends Comparable<T>> T findMax(List<T> list) {
         T max = list.getFirst();
@@ -64,75 +83,72 @@ public class UltimateUpperBounds {
         return max;
     }
 
-    /*Same as above but with no return type and just printing the elements with type-specific logic.
-    We can refer to <T> here and use it for type-specific logic.*/
+    /**
+     * Using T to perform type-specific logic inside a loop.
+     */
     public static <T extends Number> void noReturn3(List<T> list) {
         for (T element : list) {
-            //Since we have T, we can refer to the specific type of Number that was passed in, and we can perform type-specific logic based on that type.
             if (element instanceof Float) {
-                System.out.println("Float: " + element);
+                System.out.println("Float value: " + element);
             } else if (element instanceof Integer) {
-                System.out.println("Integer: " + element);
+                System.out.println("Integer value: " + element);
             } else {
-                System.out.println("Other Number: " + element);
+                System.out.println("Value: " + element + " (" + element.getClass().getSimpleName() + ")");
             }
         }
     }
 
-    // ❌ Here T is unnecessary and not required as it's not linking to anything or doing anything
+    /**
+     * ❌ REDUNDANT: T is unnecessary here because it's not used in logic or return.
+     * Use noReturnListInput(List<? extends Number>) instead.
+     */
     public static <T> void noReturn1(List<? extends Number> list) {
         System.out.println(list);
     }
 
 
-    // ❌ The "Broken" Relationship, Inout and Out put are not linked so if we try to return value from input
-    //Compiler treats it as ?  doesn't consider it of type T
+    /**
+     * ❌ BROKEN RELATIONSHIP: T is unlinked from the list.
+     * The compiler cannot guarantee that list.get(0) is a T.
+     */
     public static <T extends Number> T returnValue2(List<? extends Number> list) {
+        // return list.getFirst(); // This would fail to compile!
         return null;
     }
+
     /* =========================================================
-       3. MULTIPLE BOUNDS (Intersection Types)
+       3. ⭐⭐ MULTIPLE BOUNDS (Intersection Types)
        =========================================================
     */
 
     /**
      * RULE: Only ONE class is allowed, and it MUST be first.
-     * You can have multiple interfaces after.
      */
     public static <T extends Number & Comparable<T> & Serializable> void handleMultiBound(T item) {
-        // We can use Number methods
-        double d = item.doubleValue();
-        // AND we can use Comparable methods
-        int cmp = item.compareTo(item);
-        System.out.println("Handled item with 3 bounds: " + item);
+        double d = item.doubleValue(); // From Number
+        int cmp = item.compareTo(item); // From Comparable
+        System.out.println("Handled intersection type: " + item);
     }
 
-
-
     /* =========================================================
-       4. MULTIPLE TYPE PARAMETERS
+       4. ⭐⭐ MULTIPLE TYPE PARAMETERS
        =========================================================
     */
 
     /**
-     * You can declare multiple independent bounds.
-     * Useful for methods that process different types of inputs together.
+     * Two independent bounds (T and U).
      */
     public static <T extends Number, U extends Number> void combine(T first, U second) {
         double sum = first.doubleValue() + second.doubleValue();
-        System.out.println("Combined " + first.getClass().getSimpleName() +
-                " and " + second.getClass().getSimpleName() + ": " + sum);
+        System.out.println("Sum of " + first.getClass().getSimpleName() + " and " +
+                second.getClass().getSimpleName() + " is: " + sum);
     }
 
     /* =========================================================
-       5. NESTED BOUNDS
+       5. ⭐⭐ NESTED BOUNDS
        =========================================================
     */
 
-    /**
-     * Used for complex data structures like a list of lists.
-     * Here, the outer list contains elements that are themselves lists of numbers.
-     */
     public static void processMatrix(List<? extends List<? extends Number>> matrix) {
         for (List<? extends Number> row : matrix) {
             for (Number n : row) {
@@ -143,20 +159,13 @@ public class UltimateUpperBounds {
     }
 
     /* =========================================================
-       6. CONSTRUCTOR BOUNDS (Generic Classes)
+       6. ⭐⭐ CONSTRUCTOR BOUNDS (Generic Classes)
        =========================================================
     */
 
-    // You can also apply these bounds to the entire class
     public static class Box<T extends Number & Cloneable> {
         private T content;
-
-        public Box(T content) {
-            this.content = content;
-        }
-
-        public T getContent() {
-            return content;
-        }
+        public Box(T content) { this.content = content; }
+        public T getContent() { return content; }
     }
 }
