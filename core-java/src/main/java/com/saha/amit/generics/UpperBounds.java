@@ -1,13 +1,12 @@
 package com.saha.amit.generics;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A comprehensive guide to every common Upper Bound combination in Java Generics.
  */
-public class UltimateUpperBounds {
+public class UpperBounds {
 
     public static void main(String[] args) {
         // 1. Single Object Input

@@ -8,7 +8,7 @@ import java.util.List;
  * Core Principle: PECS (Producer Extends, Consumer Super).
  * Use 'super' when you want to WRITE to a collection.
  */
-public class UltimateLowerBounds {
+public class LowerBounds {
 
     public static void main(String[] args) {
         // 1. Basic usage: Writing Integers to a list of its supertypes
@@ -45,7 +45,11 @@ public class UltimateLowerBounds {
         // ❌ CANNOT READ as Integer safely.
         // The compiler only knows the elements are at least 'Object'.
         // Integer i = list.get(0); // Error!
-        Object obj = list.get(0); // This is allowed.
+        Object obj = list.getFirst(); // This is allowed.
+        if(list.getFirst() instanceof Integer) {
+            Integer i = (Integer) obj; // We can cast if we know the actual type.
+            System.out.println("Read Integer: " + i);
+        }
     }
 
     /* =========================================================
@@ -83,7 +87,7 @@ public class UltimateLowerBounds {
        =========================================================
     */
 
-    /**
+    /** ⭐⭐⭐
      * ❌ RULE: You CANNOT use 'super' in a formal type parameter declaration.
      * Only wildcards (?) support 'super'.
      */
@@ -91,7 +95,7 @@ public class UltimateLowerBounds {
 
     /**
      * ❌ RULE: You generally shouldn't return a lower-bounded wildcard.
-     * It forces the caller to treat the return value as 'Object'.
+     * It forces the caller to treat the return value as 'Object'⭐.
      */
     public static List<? super Integer> badReturn() {
         return new ArrayList<Number>();
