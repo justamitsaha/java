@@ -1,5 +1,6 @@
 package com.saha.amit.collection;
 
+import java.security.InvalidParameterException;
 import java.util.*;
 
 public class TestCollection {
@@ -29,39 +30,15 @@ public class TestCollection {
     ) {
     }
 
-    List<Employee> employees = List.of(
-            new Employee(101, "Amit", "IT", 25, 50000),
-            new Employee(102, "Rahul", "HR", 30, 65000),
-            new Employee(103, "Neha", "IT", 27, 55000),
-            new Employee(104, "Pooja", "FIN", 32, 70000),
-            new Employee(105, "Karan", "IT", 29, 52000),
-            new Employee(106, "Simran", "HR", 30, 65000),
-            new Employee(107, "Vikram", "OPS", 40, 80000),
-            new Employee(108, "Amit", "IT", 25, 50000), // duplicate data, diff id
-            new Employee(109, "Riya", "FIN", 28, 70000),
-            new Employee(110, "Zara", "OPS", 35, 78000)
-    );
-
-    List<Product> products = List.of(
-            new Product(1, "Laptop", "Electronics", 70000),
-            new Product(2, "Phone", "Electronics", 30000),
-            new Product(3, "Mouse", "Electronics", 800),
-            new Product(4, "Shirt", "Clothing", 2000),
-            new Product(5, "Jeans", "Clothing", 3000),
-            new Product(6, "Book", "Books", 500),
-            new Product(7, "Notebook", "Books", 200),
-            new Product(8, "Laptop", "Electronics", 70000) // duplicate
-    );
-
-    static List<Integer> numbers =
-            List.of(4, 8, 26, 8, 5, 98, 56, 8, 32, 11, 9, 4, 77, 7, 3, 2, 5, 5, 3, 2, 1);
-    static List<Integer> samllList = Arrays.asList(1, 2, 3, 4, 5, 6);
 
     public static void main(String[] args) {
-        System.out.println(reverseListWithLoop(numbers));
-        System.out.println(reverseListWithCollection(numbers));
-        System.out.println(reverseUsingStack(numbers));
-        System.out.println(rotate(samllList, 2, direction.RIGHT));
+        System.out.println("Reversed List: " + reverseListWithLoop(getData("smallList")));
+        System.out.println("Reversed List: " + reverseListWithLoop(getData("products")));
+        System.out.println("Reversed List: " + reverseListWithCollection(getData("smallList")));
+        System.out.println("Reversed List: " + reverseUsingStack(getData("smallList")));
+        System.out.println("Rotated List: " + rotate(getData("smallList"), 2, direction.RIGHT));
+        System.out.println("Rotated List: " + rotate(getData("smallList"), 2, direction.LEFT));
+        System.out.println("Swapped List: " + swap(getData("smallList"), 2, 4));
 
     }
 
@@ -71,7 +48,6 @@ public class TestCollection {
         List<T> reversed = new ArrayList<>();
         int count = 0;
         for (int i = list.size() - 1; i >= 0; i--) {
-            System.out.println(i + " " + count);
             reversed.add(list.get(i));
             count++;
         }
@@ -85,20 +61,27 @@ public class TestCollection {
     public static <T> List<T> reverseUsingStack(List<T> list) {
         if (null == list || list.isEmpty())
             throw new IllegalArgumentException();
-        Stack<T> tStack = new Stack<>();
+        Stack<T> stack = new Stack<>();
         for (T t : list)
-            tStack.push(t);
+            stack.push(t);
+        /* When list created using
+            1. Arrays.asList-> can't  change size so we can't call clear()
+            2. List.of() -> No change allowed
         list.clear();
         for (T t : tStack) {
             var item = tStack.pop();
             list.add(item);
         }
+        Hence have to switch to loop and set() method*/
+        for (int i = 0; i < list.size(); i++)
+            list.set(i, stack.pop());
         return list;
     }
 
     enum direction {RIGHT, LEFT}
 
     public static <T> List<T> rotate(List<T> list, int shift, direction direction) {
+        System.out.println(list);
         if (null == list || list.isEmpty())
             throw new IllegalArgumentException();
         List<T> result = new ArrayList<>();
@@ -115,5 +98,61 @@ public class TestCollection {
         }
         return result;
     }
+
+    public static <T> List<T> swap(List<T> list, int i, int j) {
+        if (null == list || list.isEmpty() || list.size() < i || list.size() < j)
+            throw new IllegalArgumentException();
+        T temp = list.get(i);
+        list.set(i, list.get(j));
+        list.set(j, temp);
+        return list;
+    }
+
+    /**
+     * Since static data was getting modified hence we are generating fresh unmodified data fo every operation
+     * @param type Which type of data we need
+     * @return List<?>
+     * @param <T> any
+     */
+    public static <T> List<?> getData(String type) {
+        switch (type) {
+            case ("employees") -> {
+                return Arrays.asList(
+                        new Employee(101, "Amit", "IT", 25, 50000),
+                        new Employee(102, "Rahul", "HR", 30, 65000),
+                        new Employee(103, "Neha", "IT", 27, 55000),
+                        new Employee(104, "Pooja", "FIN", 32, 70000),
+                        new Employee(105, "Karan", "IT", 29, 52000),
+                        new Employee(106, "Simran", "HR", 30, 65000),
+                        new Employee(107, "Vikram", "OPS", 40, 80000),
+                        new Employee(108, "Amit", "IT", 25, 50000), // duplicate data, diff id
+                        new Employee(109, "Riya", "FIN", 28, 70000),
+                        new Employee(110, "Zara", "OPS", 35, 78000)
+                );
+            }
+            case ("products") -> {
+                return Arrays.asList(
+                        new Product(1, "Laptop", "Electronics", 70000),
+                        new Product(2, "Phone", "Electronics", 30000),
+                        new Product(3, "Mouse", "Electronics", 800),
+                        new Product(4, "Shirt", "Clothing", 2000),
+                        new Product(5, "Jeans", "Clothing", 3000),
+                        new Product(6, "Book", "Books", 500),
+                        new Product(7, "Notebook", "Books", 200),
+                        new Product(8, "Laptop", "Electronics", 70000) // duplicate
+                );
+            }
+            case ("numbers") -> {
+                return Arrays.asList(4, 8, 26, 8, 5, 98, 56, 8, 32, 11, 9, 4, 77, 7, 3, 2, 5, 5, 3, 2, 1);
+            }
+            case ("smallList") -> {
+                return Arrays.asList(1, 2, 3, 4, 5, 6);
+            }
+            default -> {
+                throw new InvalidParameterException();
+            }
+        }
+    }
+
 
 }
