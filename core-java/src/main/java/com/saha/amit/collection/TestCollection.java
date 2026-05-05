@@ -1,8 +1,6 @@
 package com.saha.amit.collection;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class TestCollection {
 
@@ -57,22 +55,65 @@ public class TestCollection {
 
     static List<Integer> numbers =
             List.of(4, 8, 26, 8, 5, 98, 56, 8, 32, 11, 9, 4, 77, 7, 3, 2, 5, 5, 3, 2, 1);
-
+    static List<Integer> samllList = Arrays.asList(1, 2, 3, 4, 5, 6);
 
     public static void main(String[] args) {
-        System.out.println(reverseList(numbers));
+        System.out.println(reverseListWithLoop(numbers));
+        System.out.println(reverseListWithCollection(numbers));
+        System.out.println(reverseUsingStack(numbers));
+        System.out.println(rotate(samllList, 2, direction.RIGHT));
 
     }
 
-    public static <T extends Objects> List<T> reverseList(List<T> list) {
+    public static <T> List<T> reverseListWithLoop(List<T> list) {
         if (null == list || list.isEmpty())
             throw new IllegalArgumentException();
         List<T> reversed = new ArrayList<>();
         int count = 0;
         for (int i = list.size() - 1; i >= 0; i--) {
-            reversed.set(count, list.get(i));
+            System.out.println(i + " " + count);
+            reversed.add(list.get(i));
             count++;
         }
         return reversed;
     }
+
+    public static <T> List<T> reverseListWithCollection(List<T> list) {
+        return list.reversed();
+    }
+
+    public static <T> List<T> reverseUsingStack(List<T> list) {
+        if (null == list || list.isEmpty())
+            throw new IllegalArgumentException();
+        Stack<T> tStack = new Stack<>();
+        for (T t : list)
+            tStack.push(t);
+        list.clear();
+        for (T t : tStack) {
+            var item = tStack.pop();
+            list.add(item);
+        }
+        return list;
+    }
+
+    enum direction {RIGHT, LEFT}
+
+    public static <T> List<T> rotate(List<T> list, int shift, direction direction) {
+        if (null == list || list.isEmpty())
+            throw new IllegalArgumentException();
+        List<T> result = new ArrayList<>();
+        if (direction == TestCollection.direction.RIGHT) {
+            for (int i = list.size() - shift; i < list.size(); i++)
+                result.add(list.get(i));
+            for (int i = 0; i < list.size() - shift - 1; i++)
+                result.add(list.get(i));
+        } else {
+            for (int i = shift; i < list.size(); i++)
+                result.add(list.get(i));
+            for (int i = 0; i < shift; i++)
+                result.add(list.get(i));
+        }
+        return result;
+    }
+
 }
