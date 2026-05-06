@@ -2,6 +2,7 @@ package com.saha.amit.collection;
 
 import java.security.InvalidParameterException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TestCollection {
 
@@ -31,18 +32,7 @@ public class TestCollection {
     }
 
 
-    public static void main(String[] args) {
-        System.out.println("Reversed List: " + reverseListWithLoop(getData("smallList")));
-        System.out.println("Reversed List: " + reverseListWithLoop(getData("products")));
-        System.out.println("Reversed List: " + reverseListWithCollection(getData("smallList")));
-        System.out.println("Reversed List: " + reverseUsingStack(getData("smallList")));
-        System.out.println("Rotated List: " + rotate(getData("smallList"), 2, direction.RIGHT));
-        System.out.println("Rotated List: " + rotate(getData("smallList"), 2, direction.LEFT));
-        System.out.println("Swapped List: " + swap(getData("smallList"), 2, 4));
-
-    }
-
-    public static <T> List<T> reverseListWithLoop(List<T> list) {
+    private static <T> List<T> reverseListWithLoop(List<T> list) {
         if (null == list || list.isEmpty())
             throw new IllegalArgumentException();
         List<T> reversed = new ArrayList<>();
@@ -54,11 +44,12 @@ public class TestCollection {
         return reversed;
     }
 
-    public static <T> List<T> reverseListWithCollection(List<T> list) {
+
+    private static <T> List<T> reverseListWithCollection(List<T> list) {
         return list.reversed();
     }
 
-    public static <T> List<T> reverseUsingStack(List<T> list) {
+    private static <T> List<T> reverseUsingStack(List<T> list) {
         if (null == list || list.isEmpty())
             throw new IllegalArgumentException();
         Stack<T> stack = new Stack<>();
@@ -80,7 +71,7 @@ public class TestCollection {
 
     enum direction {RIGHT, LEFT}
 
-    public static <T> List<T> rotate(List<T> list, int shift, direction direction) {
+    private static <T> List<T> rotate(List<T> list, int shift, direction direction) {
         System.out.println(list);
         if (null == list || list.isEmpty())
             throw new IllegalArgumentException();
@@ -99,7 +90,7 @@ public class TestCollection {
         return result;
     }
 
-    public static <T> List<T> swap(List<T> list, int i, int j) {
+    private static <T> List<T> swap(List<T> list, int i, int j) {
         if (null == list || list.isEmpty() || list.size() < i || list.size() < j)
             throw new IllegalArgumentException();
         T temp = list.get(i);
@@ -108,11 +99,62 @@ public class TestCollection {
         return list;
     }
 
+    private static Integer secondHighest(List<Integer> list) {
+        if (null == list || list.isEmpty() || list.size() >= 2)
+            throw new IllegalArgumentException();
+        list.sort(Comparator.reverseOrder());
+        System.out.println(list.get(1));
+        int max = 0;
+        int secondMax = 0;
+        for (Integer i : list) {
+            if (i >= max)
+                max = i;
+            else if (i >= secondMax)
+                secondMax = i;
+        }
+        return secondMax;
+
+    }
+
+    private static List<Integer> topThreeLargest(List<Integer> list) {
+        if (null == list || list.isEmpty() || list.size() >= 3)
+            throw new IllegalArgumentException();
+        List<Integer> top = list.stream()
+                .sorted(Comparator.reverseOrder())
+                .limit(3)
+                .collect(Collectors.toList());
+        System.out.println(top);
+        top.clear();
+        list.sort(Comparator.reverseOrder());
+        for (int i = 0; i < 3; i++) {
+            top.add(list.get(i));
+        }
+        return top;
+    }
+
+    private static List<Integer> removeDuplicate(List<Integer> integers){
+        return null;
+    }
+
+    private static void main(String[] args) {
+        System.out.println("Reversed List: " + reverseListWithLoop(getData("smallList")));
+        System.out.println("Reversed List: " + reverseListWithLoop(getData("products")));
+        System.out.println("Reversed List: " + reverseListWithCollection(getData("smallList")));
+        System.out.println("Reversed List: " + reverseUsingStack(getData("smallList")));
+        System.out.println("Rotated List: " + rotate(getData("smallList"), 2, direction.RIGHT));
+        System.out.println("Rotated List: " + rotate(getData("smallList"), 2, direction.LEFT));
+        System.out.println("Swapped List: " + swap(getData("smallList"), 2, 4));
+        System.out.println("Second Highest: " + secondHighest((List<Integer>) getData("numbers")));
+        System.out.println("Top three: " + topThreeLargest((List<Integer>) getData("numbers")));
+    }
+
+
     /**
      * Since static data was getting modified hence we are generating fresh unmodified data fo every operation
+     *
      * @param type Which type of data we need
+     * @param <T>  any
      * @return List<?>
-     * @param <T> any
      */
     public static <T> List<?> getData(String type) {
         switch (type) {
