@@ -100,7 +100,7 @@ public class TestCollection {
     }
 
     private static Integer secondHighest(List<Integer> list) {
-        if (null == list || list.isEmpty() || list.size() >= 2)
+        if (null == list || list.isEmpty() || list.size() < 2)
             throw new IllegalArgumentException();
         list.sort(Comparator.reverseOrder());
         System.out.println(list.get(1));
@@ -117,7 +117,7 @@ public class TestCollection {
     }
 
     private static List<Integer> topThreeLargest(List<Integer> list) {
-        if (null == list || list.isEmpty() || list.size() >= 3)
+        if (null == list || list.isEmpty() || list.size() < 3)
             throw new IllegalArgumentException();
         List<Integer> top = list.stream()
                 .sorted(Comparator.reverseOrder())
@@ -132,11 +132,68 @@ public class TestCollection {
         return top;
     }
 
-    private static List<Integer> removeDuplicate(List<Integer> integers){
-        return null;
+    private static List<Integer> removeDuplicate(List<Integer> list) {
+        if (null == list || list.isEmpty())
+            throw new IllegalArgumentException();
+        List<Integer> unique = new ArrayList<>();
+        Set<Integer> set = new HashSet<>();
+        for (Integer i : list)
+            if (set.add(i))
+                unique.add(i);
+        return unique;
     }
 
-    private static void main(String[] args) {
+    private static void oddEven(List<Integer> list) {
+        List<Integer> odd = new ArrayList<>();
+        List<Integer> even = new ArrayList<>();
+        for (Integer i : list)
+            if (i % 2 == 0)
+                even.add(i);
+            else
+                odd.add(i);
+        System.out.println("Even " + even + " Odd " + odd);
+    }
+
+    private static Set<String> uniqueDepartment(List<Employee> employees) {
+        Set<String> department = new HashSet<>();
+        for (Employee employee : employees)
+            department.add(employee.dept);
+        return department;
+
+    }
+
+    private static void setOperations() {
+        Set<Integer> a = Set.of(1, 2, 3, 4, 5);
+        Set<Integer> b = Set.of(4, 5, 6, 7, 8);
+        System.out.println("Union: " + a.addAll(b));
+        System.out.println("Intersection:" + a.contains(b));
+        System.out.println("Difference: " + a.removeAll(b));
+    }
+
+    private static List<Integer> detectDuplicates(List<Integer> list) {
+        if (null == list || list.isEmpty())
+            throw new IllegalArgumentException();
+        List<Integer> duplicates = new ArrayList<>();
+        Set<Integer> set = new HashSet<>();
+        for (Integer i : list)
+            if (!set.add(i))
+                duplicates.add(i);
+        return duplicates;
+    }
+
+    private static Set<Integer> nonRepeatingItems(List<Integer> list) {
+        if (null == list || list.isEmpty())
+            throw new IllegalArgumentException();
+        Set<Integer> set = new HashSet<>();
+        Set<Integer> duplicates = new HashSet<>();
+        for (Integer i : list)
+            if (!set.add(i))
+                duplicates.add(i);
+        set.removeAll(duplicates);
+        return set;
+    }
+
+    public static void main(String[] args) {
         System.out.println("Reversed List: " + reverseListWithLoop(getData("smallList")));
         System.out.println("Reversed List: " + reverseListWithLoop(getData("products")));
         System.out.println("Reversed List: " + reverseListWithCollection(getData("smallList")));
@@ -146,6 +203,14 @@ public class TestCollection {
         System.out.println("Swapped List: " + swap(getData("smallList"), 2, 4));
         System.out.println("Second Highest: " + secondHighest((List<Integer>) getData("numbers")));
         System.out.println("Top three: " + topThreeLargest((List<Integer>) getData("numbers")));
+        System.out.println("Remove duplicates preserving insertion order: " + removeDuplicate((List<Integer>) getData("numbers")));
+        oddEven((List<Integer>) getData("numbers"));
+        System.out.println("Unique Dept: " + uniqueDepartment((List<Employee>) getData("employees")));
+        //setOperations();
+        System.out.println("Detect Duplicates: " + detectDuplicates((List<Integer>) getData("numbers")));
+        System.out.println("Non repeating items : " + nonRepeatingItems((List<Integer>) getData("numbers")));
+
+
     }
 
 
