@@ -4,7 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TestCollection {
+public class SampleProblems {
 
     record Employee(
             int id,
@@ -76,7 +76,7 @@ public class TestCollection {
         if (null == list || list.isEmpty())
             throw new IllegalArgumentException();
         List<T> result = new ArrayList<>();
-        if (direction == TestCollection.direction.RIGHT) {
+        if (direction == SampleProblems.direction.RIGHT) {
             for (int i = list.size() - shift; i < list.size(); i++)
                 result.add(list.get(i));
             for (int i = 0; i < list.size() - shift - 1; i++)
@@ -206,7 +206,7 @@ public class TestCollection {
         System.out.println("Remove duplicates preserving insertion order: " + removeDuplicate((List<Integer>) getData("numbers")));
         oddEven((List<Integer>) getData("numbers"));
         System.out.println("Unique Dept: " + uniqueDepartment((List<Employee>) getData("employees")));
-        //setOperations();
+        setOperations();
         System.out.println("Detect Duplicates: " + detectDuplicates((List<Integer>) getData("numbers")));
         System.out.println("Non repeating items : " + nonRepeatingItems((List<Integer>) getData("numbers")));
 
