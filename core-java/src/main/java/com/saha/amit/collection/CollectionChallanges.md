@@ -430,6 +430,20 @@ Example:
 ```
 key is the number and value is the frequency.
 
+**Answer**
+```java
+    private static Map<Integer, Integer> frequencyMap(List<Integer> list) {
+        if (null == list || list.isEmpty())
+            throw new IllegalArgumentException();
+        Map<Integer, Integer> map = new HashMap<>();
+        for (Integer i : list)
+            if (null != map.putIfAbsent(i, 1)) {
+                var count = map.get(i) + 1;
+                map.put(i, count);
+            }
+        return map;
+    }
+```
 ----------
 
 ## 13) Invert map
