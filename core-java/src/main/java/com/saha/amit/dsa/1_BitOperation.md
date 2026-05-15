@@ -5,25 +5,31 @@ Base of 10 e.g. 274 = 2x10^2 + 7x10^1 + 4x10^0 = 200+70=4
 ### What  is Binary?
 Base of 2 e.g. 101 = 1x2^2 + 0x2^1+ 1x2^0= 4+0+1 =5
 
-```java  
-public static void binaryToDecimal(String s) {  
-    int value = Integer.parseInt(s, 2);  
-    System.out.println(value);  
-  
-    int val2 = 0;  
-    char[] c = s.toCharArray();  
-    for (int i = 0; i < c.length; i++)  
-        val2 = val2 + Integer.parseInt(String.valueOf(c[i])) * (int) Math.pow(2, c.length - (i + 1));  
-    System.out.println(val2);  
-  
-    // Optimized manual approach (Horner's Method)  
-  val2 = 0;  
-    for (int i = 0; i < s.length(); i++) {  
-        // Shift left (multiply by 2) and add the new bit  
- // '0' becomes 48 in ASCII, '1' becomes 49. // Subtracting '0' gives you the actual 0 or 1.  val2 = (val2 * 2) + (s.charAt(i) - '0');  
-    }  
-    System.out.println(val2);  
-} 
+```java
+
+public static void main(String[] args) {
+  String s = "1001101";
+  int value = Integer.parseInt(s, 2);
+  System.out.println(value);
+
+  int val2 = 0;
+  char[] c = s.toCharArray();
+  for (int i = 0; i < c.length; i++)
+    val2 = val2 + Integer.parseInt(String.valueOf(c[i])) * (int) Math.pow(2, c.length - (i + 1));
+  System.out.println(val2);
+
+  // Optimized manual approach (Horner's Method)
+  val2 = 0;
+  // Iterate through each character of the binary string
+  for (int i = 0; i < s.length(); i++) {
+    // Get the numeric value of the current bit ('0' or '1')
+    int bit = s.charAt(i) - '0';
+
+    // Horner's Method: Multiply current result by base (2) and add next digit
+    val2 = (val2 * 2) + bit;
+  }
+  System.out.println(val2);
+}
 ```  
 ### Conversion between decimal and binary
 - Binary to decimal 101 = 1x2^2 + 0x2^1+ 1x2^0= 4+0+1 =5
