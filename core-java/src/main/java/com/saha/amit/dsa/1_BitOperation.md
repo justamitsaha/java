@@ -2,7 +2,7 @@
 
 ### 1.What is decimal?
 Base of 10 e.g. 274 = 2x10^2 + 7x10^1 + 4x10^0 = 200+70=4
-### What  is Binary?
+### 2. What  is Binary?
 Base of 2 e.g. 101 = 1x2^2 + 0x2^1+ 1x2^0= 4+0+1 =5
 
 ```java
@@ -31,7 +31,7 @@ public static void main(String[] args) {
   System.out.println(val2);
 }
 ```  
-### Conversion between decimal and binary
+### 3. Conversion between decimal and binary
 - Binary to decimal 101 = 1x2^2 + 0x2^1+ 1x2^0= 4+0+1 =5
 - Decimal to binary
 
@@ -68,11 +68,14 @@ public static void decimalToBinary(int n) {
   System.out.println(sb.reverse().toString());  
 }
 ```  
-### Binary addition
+### 4. Binary addition
 
-carry       11    Num 1       101     (5)    
-Num 2       111     (7) Solution   1100     (12)
-### Binary Subtraction
+carry        11    
+Num 1       101     (5)    
+Num 2       111     (7) 
+Solution   1100     (12)
+
+### 5. Binary Subtraction
 - Let's say we want to subtract 12-7, 12 = 1100, and 7 = 111
 - There is no subtraction is binary 12-7 is 12 +(-7).
 - So what we have to do is that we have get the -ve value of 2nd operand  7 and add it with 1st operand
@@ -99,3 +102,103 @@ Num 2       111     (7) Solution   1100     (12)
 ### 7. Importance of Shift operators
 -   **<< (Left Shift):** Shifts bits left.  Effectively multiplies the number by 2
 -   **>> (Right Shift):** Shifts bits right. It effectively divides the number by 2
+
+### 8. Importance of Bitwise operator?
+
+### 9. Is Bitwise operator faster?
+
+Answer: 
+```java
+    // Compare benchmark of Left shift vs multiplication  
+    public static void main(String[] args) {
+        // Note: Start at 1 to avoid the 0-loop trap
+
+        // Loop 1: Bitwise
+        long startTime = System.nanoTime();
+        int count1 = 0;
+        for (long i = 1; i < Integer.MAX_VALUE; i = i << 1) count1++;
+        long durationShift = System.nanoTime() - startTime;
+
+        // Loop 2: Multiplication
+        startTime = System.nanoTime();
+        int count2 = 0;
+        for (long i = 1; i < Integer.MAX_VALUE; i = i * 2) count2++;
+        long durationMult = System.nanoTime() - startTime;
+
+        System.out.println("Shift Time: " + durationShift + " ns");
+        System.out.println("Mult Time:  " + durationMult + " ns");
+        System.out.println("Count"+ count2);
+    }
+```
+If you run the corrected benchmark above, you will likely find that the times are almost identical.
+Modern compilers automatically optimize jave operations . The compiler looks out for you and rewrites your math to be as fast as possible!
+```java
+//Compare benchmark of & operation with modulus both used to check even
+public static void main(String[] args) {
+  int iterations = 500_000_000; // Large enough to trigger JIT optimization
+
+  // --- WARM-UP PHASE ---
+  // Run both heavily first so the JVM compiles them equally before we measure
+  runBitwise(iterations);
+  runModulus(iterations);
+
+  // --- ACTUAL MEASUREMENT ---
+  long startTime = System.nanoTime();
+  long bitwiseResult = runBitwise(iterations);
+  long bitwiseTime = System.nanoTime() - startTime;
+
+  startTime = System.nanoTime();
+  long modulusResult = runModulus(iterations);
+  long modulusTime = System.nanoTime() - startTime;
+
+  // Print results to prevent Dead Code Elimination
+  System.out.println("Bitwise Time: " + bitwiseTime + " ns (Result checksum: " + bitwiseResult + ")");
+  System.out.println("Modulus Time: " + modulusTime + " ns (Result checksum: " + modulusResult + ")");
+}
+
+private static long runBitwise(int iterations) {
+  long count = 0;
+  for (int i = 1; i < iterations; i++) {
+    if ((i & 1) == 0) { // Check if even
+      count++;
+    }
+  }
+  return count;
+}
+
+private static long runModulus(int iterations) {
+  long count = 0;
+  for (int i = 1; i < iterations; i++) {
+    if ((i % 2) == 0) { // Check if even
+      count++;
+    }
+  }
+  return count;
+}
+```
+
+**So with modern JIT compiler bitwise operations won't show much effert**
+
+Think of bitwise operations less as a way to speed up your everyday total * 2 calculations, and more as a toolkit for data manipulation, compression, and hardware communication.
+
+uses
+- Hardware and Embedded Systems (IoT): If you ever write code that interacts directly with hardware (like an Arduino, Raspberry Pi, or device drivers), you talk to the hardware via "registers." To turn on a physical LED light on a circuit board, you don't call a function like turnOnLight(). Instead, you write a bitwise operation that sets a specific bit on a specific hardware register memory address to 1.
+- Efficient Data Structures (Bitsets) : Imagine you need to keep track of a unique list of millions of user IDs to see if they are active today. Storing millions of Integer objects in a HashSet will consume massive amounts of RAM. Instead, you can use a Bitset (or java.util.BitSet). It allocates a giant block of bits. If user #5422 is active, you flip the 5422nd bit to 1.
+- Cryptography and Hashing : Almost every major cryptographic algorithm (AES, RSA) and hashing function (SHA-256, MD5) relies heavily on bitwise operations. Algorithms use XOR (^), AND (&), and Bit Rotations to scramble data. The beauty of the XOR operation is that it is perfectly reversible: (A ^ B) ^ B = A. This makes it the foundational building block of encryption.
+- Networking Protocols and Binary File Formats :When sending data over a network or saving it to a compact binary file (like a JPEG, ZIP, or MP3), every byte counts. Network packets (like IPv4 headers) compress data down to the bit level to save bandwidth. If a protocol dictates that the first 4 bits of a byte represent the protocol version and the next 4 bits represent the header length, you must use bitwise shifts and masks to slice that byte open and read the data.
+- High-Performance Graphics and Game Dev: In game development, colors are usually represented as ARGB (Alpha, Red, Green, Blue). Each channel takes 8 bits (a value from 0 to 255). Instead of creating a complex object for every single pixel on a screen, developers pack all four channels into a single 32-bit integer. Bitwise operations are used to extract individual colors instantly:
+- Managing Flags and Permissions (The Bitmask): Instead of storing a bunch of boolean variables (which take up at least 1 byte each in memory), you can pack up to 32 distinct true/false flags into a single int (4 bytes). A classic example is file permissions (Read, Write, Execute): Where you see this: File systems (Linux chmod), Android intent flags, game engine states, and database configuration settings.
+```java
+public static final int READ    = 1; // 0001
+public static final int WRITE   = 2; // 0010
+public static final int EXECUTE = 4; // 0100
+
+// Assigning permissions using Bitwise OR (|)
+int userPermissions = READ | WRITE;   // 0011 (Can Read and Write)
+
+// Checking permissions using Bitwise AND (&)
+boolean canExecute = (userPermissions & EXECUTE) == EXECUTE; // false
+```
+
+
+
