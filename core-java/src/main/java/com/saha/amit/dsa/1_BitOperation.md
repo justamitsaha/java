@@ -22,9 +22,9 @@ public static void main(String[] args) {
   val2 = 0;
   // Iterate through each character of the binary string
   for (int i = 0; i < s.length(); i++) {
-    // Get the numeric value of the current bit ('0' or '1')
+    // Get the ASCII numeric value of the current bit ('0' or '1') which will be either 48 or 49
+    // when we subtract '0' we remove ASCII 40 leaving us with 0 or 1
     int bit = s.charAt(i) - '0';
-
     // Horner's Method: Multiply current result by base (2) and add next digit
     val2 = (val2 * 2) + bit;
   }

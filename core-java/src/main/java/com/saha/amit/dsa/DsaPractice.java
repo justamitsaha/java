@@ -3,27 +3,24 @@ package com.saha.amit.dsa;
 public class DsaPractice {
 
     public static void main(String[] args) {
-        String s = "1001101";
-        int value = Integer.parseInt(s, 2);
-        System.out.println(value);
+        int n = 77;
+        System.out.println(Integer.toBinaryString(n));
 
-        int val2 = 0;
-        char[] c = s.toCharArray();
-        for (int i = 0; i < c.length; i++)
-            val2 = val2 + Integer.parseInt(String.valueOf(c[i])) * (int) Math.pow(2, c.length - (i + 1));
-        System.out.println(val2);
-
-        // Optimized manual approach (Horner's Method)
-        val2 = 0;
-        // Iterate through each character of the binary string
-        for (int i = 0; i < s.length(); i++) {
-            // Get the numeric value of the current bit ('0' or '1')
-            int bit = s.charAt(i) - '0';
-
-            // Horner's Method: Multiply current result by base (2) and add next digit
-            val2 = (val2 * 2) + bit;
+        // 2. Optimized manual approach
+        if (n == 0) {
+            System.out.println("0");
+            return;
         }
-        System.out.println(val2);
+
+        // Since we are concatenating StringBuilder  is better than String
+        StringBuilder sb = new StringBuilder();
+        // We use a temp variable to keep 'n' intact if needed later
+        for (int i = n; i > 0; i = i >> 2) {
+            sb.append(i % 2);
+        }
+
+        // Since we appended to the end, we must reverse it
+        System.out.println(sb.reverse().toString());
     }
 
 
