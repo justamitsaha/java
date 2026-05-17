@@ -1,21 +1,16 @@
 package com.saha.amit.dsa;
 
+import java.util.BitSet;
+
 public class DsaPractice {
 
 
     public static void main(String[] args) {
-        //All these are divide by 2
-        int i = 128;
-        System.out.println(i / 2);
-        System.out.println(i = i / 2);
-        i = 128;
-        System.out.println(i >> 1);
-        System.out.println(i >> 2); //divide by 4
+        int a = 10, b = 20;
+        a = a + b; // a = 30
+        b = a - b; // b = 30 - 20 = 10
+        a = a - b; // a = 30 - 10 = 20
 
-        System.out.println(i << 2); //multiply by 4
-
-        System.out.println((i & 1)); //odd even test
-        System.out.println(i);
-
+        System.out.println("a: " + a + ", b: " + b); // Prints: a: 10, b: 5
     }
 }

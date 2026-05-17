@@ -1,0 +1,3 @@
+### 1.Bit masking
+
+Answer : Bit masking is a programming technique that uses bitwise operators (AND, OR, XOR, NOT) to manipulate specific bits—setting, clearing, or reading individual binary digits—within an integer, often used to store multiple boolean flags compactly or for optimized data processing. It acts as a filter to hide or modify data, usually at high speeds, which is beneficial in competitive programming and low-level system operations

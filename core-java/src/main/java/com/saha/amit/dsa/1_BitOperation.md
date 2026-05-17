@@ -1,6 +1,6 @@
 
 
-### 1.What is decimal?
+###  1.What is decimal?
 Base of 10 e.g. 274 = 2x10^2 + 7x10^1 + 4x10^0 = 200+70=4
 ### 2. What  is Binary?
 Base of 2 e.g. 101 = 1x2^2 + 0x2^1+ 1x2^0= 4+0+1 =5
@@ -103,9 +103,7 @@ Solution   1100     (12)
 -   **<< (Left Shift):** Shifts bits left.  Effectively multiplies the number by 2
 -   **>> (Right Shift):** Shifts bits right. It effectively divides the number by 2
 
-### 8. Importance of Bitwise operator?
-
-### 9. Is Bitwise operator faster?
+### 8. Is Bitwise operator faster?
 
 Answer: 
 ```java
@@ -200,5 +198,173 @@ int userPermissions = READ | WRITE;   // 0011 (Can Read and Write)
 boolean canExecute = (userPermissions & EXECUTE) == EXECUTE; // false
 ```
 
+### 9. Importance of Bitwise operator?
+
+Here are some of the most practical, clever, and meaningful bitwise operations used in real-world programming. You can add these directly to your collection.
+
+----------
+
+- Swapping Two Numbers Without a Temporary Variable
+
+  Using the **XOR (`^`)** operator, you can swap two integers completely in place without allocating a third `temp` variable.
 
 
+
+  ```java
+  public static void main(String[] args) {
+      int a = 5;  // 0101
+      int b = 10; // 1010
+
+      a = a ^ b; // a now holds the combined bits
+      b = a ^ b; // b becomes the original a (5)
+      a = a ^ b; // a becomes the original b (10)
+
+      System.out.println("a: " + a + ", b: " + b); // Prints: a: 10, b: 5
+  }
+  ```
+```java
+    public static void main(String[] args) {
+        int a = 10, b = 20;
+        a = a + b; // a = 30
+        b = a - b; // b = 30 - 20 = 10
+        a = a - b; // a = 30 - 10 = 20
+
+        System.out.println("a: " + a + ", b: " + b); // Prints: a: 10, b: 5
+    }
+```
+
+- Checking if a Number is a Power of 2
+
+  Powers of 2 (like 2, 4, 8, 16, 32...) always have exactly **one** bit set to `1` in binary (e.g., $8$ is `1000`). If you subtract 1 from a power of 2, all trailing zeros flip to ones (e.g., $7$ is `0111`).
+
+  Doing a bitwise AND between them results in exactly `0`.
+
+
+
+  ```java 
+  public static void main(String[] args) {
+      int n = 16;
+      // If (n & (n - 1)) == 0, it's a power of 2 (Note: n must be greater than 0)
+      boolean isPowerOfTwo = (n > 0) && ((n & (n - 1)) == 0);
+
+      System.out.println(n + " is power of 2? " + isPowerOfTwo); // true
+  }
+  ```
+
+- Slicing/Extracting Specific Bytes (Bit Masking)
+
+  When dealing with network packets, colors, or file headers, you often need to isolate a single byte out of a 4-byte integer. You do this by shifting the desired byte to the rightmost position and using a mask of `0xFF` (which is `11111111` in binary) to clear everything else.
+
+
+  ```java
+  public static void main(String[] args) {
+      // Example: An ARGB color packed into one integer
+      int color = 0xFF33A2B4;
+
+      int green = (color >> 8) & 0xFF; // Shift right by 8 bits, mask out the rest
+      System.out.println("Green channel value: " + green); // 162 (0xA2)
+  }
+  ```
+
+- Toggling a Value (On / Off Switch)
+
+  Instead of writing an `if-else` statement to flip a value back and forth between two states, you can use XOR to toggle a specific bit.
+
+    ```java
+    public static void main(String[] args) {
+        int flags = 0b0000; // Binary literal for 0
+        int BLUETOOTH_ON = 0b0100;
+
+        // Toggle Bluetooth state (If it's off, turn it on. If it's on, turn it off)
+        flags = flags ^ BLUETOOTH_ON;
+        System.out.println(Integer.toBinaryString(flags)); // 100 (Now it's on)
+
+        flags = flags ^ BLUETOOTH_ON;
+        System.out.println(Integer.toBinaryString(flags)); // 0 (Now it's off)
+    }
+    ```
+
+- Getting the Absolute Value (Without Math.abs)
+
+  You can find the absolute value of an integer by using the sign bit (the leftmost bit in a 2's complement number). Shifting an `int` right by 31 copies the sign bit to every position, creating a mask of all 0s (for positive) or all 1s/`-1` (for negative).
+
+
+  ```java
+  public static void main(String[] args) {
+      int x = -45;
+      int mask = x >> 31; // yields -1 if negative, 0 if positive
+      int absX = (x + mask) ^ mask;
+
+      System.out.println("Absolute value: " + absX); // 45
+  }
+  ```
+
+- Clearing the Lowest Set Bit
+
+  This is a variation of the power-of-two trick. `n & (n - 1)` will always find the lowest (rightmost) `1` bit in a number and flip it to `0`. This is highly useful in algorithms that need to count how many total `1` bits are inside a number (Hamming weight).
+
+
+  ```java
+  public static void main(String[] args) {
+      int number = 0b10110; // 22 in decimal
+      int cleared = number & (number - 1);
+
+      System.out.println(Integer.toBinaryString(cleared)); // 10100 (The lowest 1 bit is gone!)
+  }
+  ```
+
+### 10. BitSet Operation
+
+
+#### The Visual Difference: HashSet vs. BitSet
+
+When you store a user ID in a `HashSet<Integer>`, Java doesn't just store the number. It wraps each primitive `int` in an `Integer` object, creates a `HashMap.Node` object, and manages pointers.
+
+In contrast, a `BitSet` is just a long array of primitive `long` values (64 bits each) laid out back-to-back in memory.
+
+#### The Downside of a HashSet
+
+If you stored those same 1 million unique user IDs in a `HashSet<Integer>` on a 64-bit Java Virtual Machine:
+
+1.  Every primitive `int` ($4\text{ bytes}$) is boxed into an `Integer` object ($16\text{ bytes}$).
+
+2.  The `HashSet` wraps this inside a `HashMap$Node` object ($32\text{ bytes}$).
+
+3.  The underlying table tracking the nodes uses object references ($8\text{ bytes}$ per bucket).
+
+
+Ultimately, a `HashSet` consumes roughly **32 to 40 Megabytes** to track 1 million dense IDs. The `BitSet` accomplishes the exact same task in **122 Kilobytes**—making it roughly **300 times more memory-efficient**.
+
+#### When should you _not_ use a BitSet?
+
+BitSets are perfect when your IDs are dense (e.g., auto-incrementing database IDs from 1 to 10,000,000).
+
+If your IDs are wildly sparse—for example, if you only have 2 active users, but their IDs are `7` and `2,000,000,000`—the `BitSet` will blindly allocate enough bits to reach index 2 billion, consuming around 240 MB of RAM just to hold two flags. In that rare, highly sparse scenario, a `HashSet` or a compressed bitmap (like RoaringBitmap) is a better choice.
+```java
+    public static void main(String[] args) {
+        // Create a BitSet. It dynamically expands, but you can give it an initial size.
+        // For 10 million users, it will allocate roughly 1.2 MB of memory up front.
+        BitSet activeUsers = new BitSet(10_000_000);
+
+        // 1. Mark users as active (Flipping the bit at that specific index to 1)
+        int userA = 5422;
+        int userB = 9_999_999;
+        int userC = 75;
+
+        activeUsers.set(userA);
+        activeUsers.set(userB);
+        activeUsers.set(userC);
+
+        // 2. Check if a user is active (Near-instantaneous O(1) bitwise lookup)
+        System.out.println("Is user 5422 active? " + activeUsers.get(5422));      // true
+        System.out.println("Is user 100000 active? " + activeUsers.get(100000));  // false
+        System.out.println("Is user 75 active? " + activeUsers.get(75));          // true
+
+        // 3. Deactivate a user (Flip the bit back to 0)
+        activeUsers.clear(5422);
+        System.out.println("Is user 5422 still active? " + activeUsers.get(5422)); // false
+
+        // 4. Total count of active users (Counts how many bits are set to 1)
+        System.out.println("Total active users today: " + activeUsers.cardinality()); // 2
+    }
+```
