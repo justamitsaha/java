@@ -8,6 +8,30 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Test {
+
+
+    public static void main(String[] args) {
+        System.out.println(frequencyMap(numbers));
+        toBinary();
+    }
+
+    private static Map<Integer, Integer> frequencyMap(List<Integer> list) {
+        if (null == list || list.isEmpty())
+            throw new IllegalArgumentException();
+        Map<Integer, Integer> map = new HashMap<>();
+        for (Integer i : list)
+            if (null != map.putIfAbsent(i, 1)) {
+                var count = map.get(i) + 1;
+                map.put(i, count);
+            }
+        return map;
+    }
+
+    private static void toBinary(){
+        String b = "101101";
+        System.out.println(Integer.parseInt(b,2));
+    }
+
     record Employee(
             int id,
             String name,
@@ -57,26 +81,4 @@ public class Test {
             1);
 
     static List<Integer> smallList = new ArrayList<>(List.of(1, 2, 3, 4, 5, 1));
-
-    public static void main(String[] args) {
-        System.out.println(frequencyMap(numbers));
-        toBinary();
-    }
-
-    private static Map<Integer, Integer> frequencyMap(List<Integer> list) {
-        if (null == list || list.isEmpty())
-            throw new IllegalArgumentException();
-        Map<Integer, Integer> map = new HashMap<>();
-        for (Integer i : list)
-            if (null != map.putIfAbsent(i, 1)) {
-                var count = map.get(i) + 1;
-                map.put(i, count);
-            }
-        return map;
-    }
-
-    private static void toBinary(){
-        String b = "101101";
-        System.out.println(Integer.parseInt(b,2));
-    }
 }

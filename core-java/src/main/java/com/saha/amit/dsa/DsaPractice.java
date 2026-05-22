@@ -5,12 +5,15 @@ import java.util.BitSet;
 public class DsaPractice {
 
 
+    //find the 5th bit of 439802
     public static void main(String[] args) {
-        int a = 10, b = 20;
-        a = a + b; // a = 30
-        b = a - b; // b = 30 - 20 = 10
-        a = a - b; // a = 30 - 10 = 20
-
-        System.out.println("a: " + a + ", b: " + b); // Prints: a: 10, b: 5
+        int i = 439802;
+        int mask = 1 << 5;
+        System.out.println(Integer.toBinaryString(mask));
+        if ((i & mask) ==0)
+            System.out.println("5th element is 0");
+        else
+            System.out.println("5th element is 1");
+        System.out.println(Integer.toBinaryString(i));
     }
 }

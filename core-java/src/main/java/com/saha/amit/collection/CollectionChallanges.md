@@ -99,7 +99,7 @@ Using collection utility
     }
 ```
 
-Using stack
+Using stack(Candidate for Flux operations as well)
 ```java
 
     private static <T> List<T> reverseUsingStack(List<T> list) {
@@ -125,7 +125,7 @@ Using stack
 
 ----------
 
-## 2) Rotate list
+## 2) Rotate/Shift list
 
 Rotate by:
 
