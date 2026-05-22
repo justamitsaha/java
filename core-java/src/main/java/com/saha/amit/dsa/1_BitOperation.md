@@ -1,6 +1,6 @@
 
 
-###  1.What is decimal?
+##  1.What is decimal?
 Base of 10 e.g. 274 = 2x10^2 + 7x10^1 + 4x10^0 = 200+70=4
 ### 2. What  is Binary?
 Base of 2 e.g. 101 = 1x2^2 + 0x2^1+ 1x2^0= 4+0+1 =5
