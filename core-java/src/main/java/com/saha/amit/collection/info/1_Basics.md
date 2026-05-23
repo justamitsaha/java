@@ -12,7 +12,7 @@
 
     -   **Definition & Structure**:
         -   **Collection**: It is the root interface of the Java Collections Framework (JCF). It defines common methods like  `add()`,  `remove()`, and  `size()` for any object that groups elements.
-        -   **Collections**: It is a  `final` utility class. It cannot be instantiated; you call its methods directly using the class name (e.g.,  `Collections.sort(myList)`).
+        -   **Collections**: Its `abstract` so you can't create instance of it, It `final` so it can't be inherited. It basically **locks down the implementation** so that you can't modify it and use it as it is.
     -   **Functionality**:
         -   **Collection**: Focuses on  **how data is stored**. For instance,  `ArrayList` or  `HashSet` implement this interface to define their specific storage logic.
         -   **Collections**: Focuses on  **operations on data**. It includes polymorphic algorithms for sorting, searching, reversing, and making collections thread-safe (e.g.,  `synchronizedList()`).
@@ -45,12 +45,12 @@
   - **ArrayList:** When you need fast random access and are primarily adding/removing elements at the end of the list.
   - **LinkedList:** When you need frequent insertions/deletions in the middle of the list or when you want to implement a queue or deque.
 
-- ## 4) Difference between **List vs Set**?
+- ## 5) Difference between **List vs Set**?
   The primary difference between a  **List** and a **Set** lies in how they handle duplicate elements and the order of those elements.
     -   **Use a List** when you need to maintain a specific sequence of items (e.g., a message history) or when you expect and need to allow duplicate entries.
     -   **Use a Set** when the uniqueness of items is critical (e.g., a list of unique user IDs) and when you need to quickly check if an item exists in the collection.
 
-- ## 5) What is **HashMap**? How does it work internally?
+- ## 6) What is **HashMap**? How does it work internally?
     - A HashMap is a data structure that stores data in key-value pairs.
     - Allows for nearly constant-time0(1) performance for basic operations like insertion, retrieval, and deletion on average.
     - Inside java.util and part of Collection framework but not related to collection interface.
@@ -66,7 +66,7 @@
     - **Hashing and Index Calculation**
       - **Generate Hash Code**: Java calls the key's  `hashCode()` method to get an integer.
       - **Secondary Hash**: HashMap applies an additional internal hashing function (bit manipulation) to the raw hash code to ensure keys are spread evenly across the array.
-      - **Determine Bucket Index**: The final index is calculated using a bitwise AND operation:  `index = (capacity - 1) & hash`
+      - **Determine Bucket Index**: The final index is calculated using a bitwise AND operation:  `index = (arrayLength - 1) & hash`
 
   - **Storing the Pair (Put Operation)**
     - If the calculated bucket is  **empty**, the new node is stored directly in that slot.
@@ -74,7 +74,7 @@
 
   - **Collision Handling** HashMap handles collisions using  **Chaining**.
     - **Linked List**: Initially, all entries at the same index are linked together in a single linked list.
-    - **Treeification (Java 8 Improvement)**: If a single bucket exceeds a threshold (8 nodes) and the overall capacity is at least 64, the linked list is converted into a  **Balanced Red-Black Tree**. This improves search performance from O(n)  to O(log n) for that specific bucket.
+    - **Treeification (Java 8 Improvement)**: A malicious user or poorly written hashCode() function forces thousands of keys into the exact same bucket. An $O(n)$ lookup would grind your application to a halt.Java 8 solves this with Treeification. If a single bucket exceeds a threshold (8 nodes) and the overall capacity is at least 64, the linked list is converted into a  **Balanced Red-Black Tree**. This improves search performance from O(n)  to O(log n) for that specific bucket.
 
   - **Retrieval (Get Operation)**
     - HashMap calculates the hash and index of the key.
@@ -90,7 +90,7 @@
       - **Ordering**: It does  **not** maintain any order of elements.
       - **Thread Safety**: It is  **not thread-safe**; use  `ConcurrentHashMap` for multi-threaded environments
 
-- ## 6) Difference between **HashMap vs Hashtable**?
+- ## 7) Difference between **HashMap vs Hashtable**?
   HashMap and Hashtable both store key-value pairs in Java, but differ primarily in synchronization and null handling. HashMap is non-synchronized (not thread-safe), allows one null key and multiple null values, and is faster. Hashtable is synchronized (thread-safe), prohibits null keys or values, and is considered legacy code      
   **Key Differences:**
 
@@ -104,7 +104,7 @@
         - **Use HashMap:** For almost all scenarios, particularly single-threaded, due to better performance.
         - **Use Hashtable:** Generally, it should not be used in new code. Use  **`ConcurrentHashMap`** for high-concurrency needs
 
-- ## 7) What is **load factor** and **initial capacity** in HashMap?
+- ## 8) What is **load factor** and **initial capacity** in HashMap?
 1. Initial Capacity
 
 -   **Definition:**  The number of buckets (internal storage slots) created when the  [HashMap](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html)  is first initialized.
@@ -119,7 +119,7 @@
     -   **Higher Load Factor (> 0.75):**  Decreases memory overhead but increases lookup time (higher chance of hash collisions).
     -   **Lower Load Factor (< 0.75):**  Increases memory consumption but leads to faster lookups as buckets remain relatively empty.
 
-- ## 8) What happens when two keys have same hash? (collision handling)
+- ## 9) What happens when two keys have same hash? (collision handling)
   In Java's `HashMap`, when two keys have the same hash code (or map to the same bucket index), it is called a **collision**. The `HashMap` handles this by allowing multiple entries to coexist in the same bucket using a technique called  **chaining**.
   1. The Chaining Process
         When a collision occurs, the  `HashMap`  follows these internal steps:
@@ -142,4 +142,11 @@
 
     
 
-- ## 9) Difference between **equals() and hashCode()**?
+- ## 10) Difference between **equals() and hashCode()**?
+ **equals(Object obj)**: This determines if another object is "equal to" the current one. By default (inherited from the Object class), it uses the == operator, meaning it only returns true if both variables point to the exact same memory address. Usually, you override it to check **meaningful data fields** (like comparing two User objects by their userId).
+
+ **hashCode()**: This returns an integer value generated by an algorithm based on the object's memory address or its internal fields. It doesn't prove two objects are identical, but it is incredibly fast to compute. It’s primarily used by hash-based collections like HashMap, HashSet, and Hashtable to determine _where_ to store an object.
+ ***The Strict Contract between Equals and HashCode***
+ If you override one of these methods, **you must override both.** Java relies on a strict contract between them:
+ 
+**What happens if you break the contract?** If you override equals() but forget hashCode(), two objects might be completely equal according to your logic, but have different hash codes. If you try to put them in a HashMap, the map will store them in different locations. When you try to retrieve the object later, the map won't be able to find it, causing silent, incredibly frustrating bugs.

@@ -1,7 +1,9 @@
 # Bit masking
 
-Bit masking is a programming technique that uses bitwise operators (AND, OR, XOR, NOT) to manipulate specific bits—setting, clearing, or reading individual binary digits—within an integer, often used to store multiple boolean flags compactly or for optimized data processing. It acts as a filter to hide or modify data, usually at high speeds, which is beneficial in competitive programming and low-level system operations
-**Note** In computer science and digital electronics, you almost always start counting from the right, beginning at 0.So, when ever we say for e.g. 5th bit, it means 6th element as we are starting from 0/
+ Bit masking is a programming technique that uses bitwise operators (AND, OR, XOR, NOT) to manipulate specific bits—setting, clearing, or reading individual binary digits—within an integer, often used to store multiple boolean flags compactly or for optimized data processing. It acts as a filter to hide or modify data, usually at high speeds, which is beneficial in competitive programming and low-level system operations
+ 
+ **Note** In computer science and digital electronics, you almost always start counting from the right, beginning at 0.So, when ever we say for e.g. 5th bit, it means 6th element as we are starting from 0.
+
 ## 1.Find ith bit: Find 3rd bit of 101101
 
  Solution: Create a **mask** which looks 00100. 3rd Bit(the one we intend to find) is 1 rest zero. Do `AND` operation. We know if one digit is 0 in `AND` it will become zero. So in this case if 3rd bit is zero the result of `AND` will be zero otherwise non-zero
@@ -16,19 +18,19 @@ Bit masking is a programming technique that uses bitwise operators (AND, OR, XOR
     | 001000 |
     | 001000 |
 
- Result Non-zero 3rd bit is non zero
+ Result Non-zero 3rd bit is non-zero
  Another example find 3rd bit in 10000
 
- | OR    |
- |:------|
- | 10000 |
- | 01000 |
- | 00000 |
+   | AND   |
+   |:------|
+   | 10000 |
+   | 01000 |
+   | 00000 |
  Result is zero so 3rd bit is zero
 
  Code challenge find the 5th bit of 439802
 
- `
+ ```java
     //find the 5th bit of 439802
     public static void main(String[] args) {
         int i = 439802;
@@ -40,7 +42,9 @@ Bit masking is a programming technique that uses bitwise operators (AND, OR, XOR
         else
             System.out.println("5th element is 1");
     }
- `
+```
+
+ 
  
 ## 2.Set ith bit to 1: Set the 5th bit of 10010101 as 1
 
@@ -56,8 +60,7 @@ Bit masking is a programming technique that uses bitwise operators (AND, OR, XOR
 | 10110101 |
 
 Code challenge:  change the 5th bit of 54656
-`
-java
+```java
     //change the 5th bit of 54656 to 1
     public static void main(String[] args) {
         int i = 54656;
@@ -67,7 +70,7 @@ java
         System.out.println("Masked Value:   " + Integer.toBinaryString(mask));
         System.out.println("Result Value:   " + Integer.toBinaryString(result));
     }
-`
+```
 
 ## 3.Set the ith bit to 0: Set the 5th bit of 10101011 as 0
 

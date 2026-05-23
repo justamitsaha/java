@@ -11,8 +11,6 @@ public class Test {
 
 
     public static void main(String[] args) {
-        System.out.println(frequencyMap(numbers));
-        toBinary();
     }
 
     private static Map<Integer, Integer> frequencyMap(List<Integer> list) {
