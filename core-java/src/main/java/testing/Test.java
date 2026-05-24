@@ -11,6 +11,8 @@ public class Test {
 
 
     public static void main(String[] args) {
+        System.out.println(numbers.indexOf(3));;
+
     }
 
     private static Map<Integer, Integer> frequencyMap(List<Integer> list) {
