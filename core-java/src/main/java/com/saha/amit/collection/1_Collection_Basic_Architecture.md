@@ -75,120 +75,167 @@ Key Features
 
 
 ### 3. Vectors
-
 In Java, a **Vector** is a growable array of objects that belongs to the `java.util` package. It is similar to an `ArrayList` but is **synchronized**, meaning it is thread-safe for use in multi-threaded environments.
 
 Key Characteristics
+-   **Thread Safety:** Every individual operation is synchronized.
+-   **Dynamic Sizing:** Grows by doubling its size (or by a specific increment) when full.
+-   **Legacy Class:** Introduced in JDK 1.0; later retrofitted to implement `List`.
 
--   **Dynamic Sizing:** Unlike standard arrays, vectors can grow or shrink in size as needed.
--   **Thread Safety:** Every individual operation in a Vector is synchronized, making it safe for multiple threads to access it concurrently.
--   **Legacy Class:** Introduced in JDK 1.0, it is considered a legacy class but was later updated to implement the `List` interface.
--   **Performance:** Because of synchronization overhead, it is generally slower than
-
-Note: For modern applications where thread safety is not required, ArrayList is preferred. If you need thread safety, consider CopyOnWriteArrayList for better performance
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Access** | `get(index)` | **O(1)** | Direct array index lookup. |
+| **Insertion** | `add(e)` | **O(1)* / O(n)** | Amortized O(1) unless resizing is needed. |
+| **Deletion** | `remove(index)` | **O(n)** | Requires shifting elements. |
 
 ### 4. Stack
-In Java, a **Stack** is a linear data structure that follows the **Last-In, First-Out (LIFO)** principle. This means the last element added to the stack is the first one to be removed, similar to a physical stack of plates.
+A linear data structure following the **Last-In, First-Out (LIFO)** principle.
 
-**Core Operations** The `java.util.Stack` class provides five primary methods for managing elements: 
+Key Features
+-   **Legacy Design:** Extends `Vector`, which is considered a design flaw as it exposes non-stack methods.
+-   **Thread Safe:** Inherits synchronization from `Vector`.
 
--   **`push(E item)`**: Adds an item to the very top of the stack.
--   **`pop()`**: Removes and returns the object at the top of the stack.
--   **`peek()`**: Looks at the top object without removing it from the stack.
--   **`empty()`**: Checks if the stack is currently empty.
--   **`search(Object o)`**: Returns the 1-based position of an object from the top of the stack
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Push** | `push(e)` | **O(1)** | Adds to the end of the internal array. |
+| **Pop/Peek** | `pop()` / `peek()` | **O(1)** | Accesses the last element. |
+| **Search** | `search(o)` | **O(n)** | Traverses to find the object. |
 
-```java
-Stack<String> stack = new Stack<>();
-stack.push("First");
-stack.push("Second");
-
-System.out.println(stack.peek()); // Output: Second
-System.out.println(stack.pop());  // Output: Second (removes it)
-System.out.println(stack.empty()); // Output: false
-
-```
-
-you should **not** use the traditional `java.util.Stack` class in modern Java development. 
-
-Why You Should Avoid?
-
--   **Flawed Design**: It extends `Vector`, allowing you to use non-stack methods like `add(index, element)`. This breaks the core LIFO principle.
--   **Poor Performance**: It uses synchronized methods for thread safety, creating unnecessary performance overhead in single-threaded applications.
-
-you should **not** use the traditional `java.util.Stack` class in modern Java development. 
-
-Why You Should Avoid It
-
--   **Flawed Design**: It extends `Vector`, allowing you to use non-stack methods like `add(index, element)`. This breaks the core LIFO principle.
--   **Poor Performance**: It uses synchronized methods for thread safety, creating unnecessary performance overhead in single-threaded applications.
+---
 
 ## 2. Queue
-A **Queue** is a collection designed for holding elements prior to processing. Besides basic `Collection` operations, queues provide additional insertion, extraction, and inspection operations. Most follow a **FIFO (First-In-First-Out)** order.
-
-**Key Methods**
-- `add(E e)` / `offer(E e)`: Inserts an element. `offer` is preferred for capacity-restricted queues.
-- `remove()` / `poll()`: Removes and returns the head. `poll` returns `null` if empty.
-- `element()` / `peek()`: Returns the head without removing. `peek` returns `null` if empty.
+A collection designed for holding elements prior to processing.
 
 ### 1. PriorityQueue
-An unbounded queue based on a **priority heap**. Elements are ordered according to their natural ordering or by a `Comparator`.
-- **Ordering**: Not FIFO; elements are processed based on priority.
-- **Nulls**: Does not permit `null` elements.
-- **Performance**: $O(\log n)$ for `offer` and `poll`; $O(1)$ for `peek`.
+An unbounded queue based on a **priority heap**.
 
-### 2. Deque (Double Ended Queue)
-A linear collection that supports element insertion and removal at both ends.
-- **ArrayDeque**: Faster than `Stack` when used as a stack, and faster than `LinkedList` when used as a queue.
-- **LinkedList**: Also implements `Deque`.
+Key Characteristics
+-   **Ordering**: Elements are ordered by natural ordering or a `Comparator`.
+-   **Nulls**: Does not permit `null`.
+-   **Non-Thread-Safe**: Use `PriorityBlockingQueue` for concurrent access.
+
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Offer/Add** | `offer(e)` | **O(log n)** | Must maintain the heap property. |
+| **Poll/Remove** | `poll()` | **O(log n)** | Requires heap "sift-down" after removal. |
+| **Peek** | `peek()` | **O(1)** | Head of the heap is always at the root. |
+
+### 2. ArrayDeque (Deque)
+A resizable-array implementation of the `Deque` interface.
+
+Key Features
+-   **Double-Ended**: Efficient insertion and removal from both ends.
+-   **No Nulls**: Prohibits `null` elements.
+-   **Performance**: Usually faster than `Stack` and `LinkedList`.
+
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Insert Front/Back** | `addFirst()` / `addLast()` | **O(1)** | Amortized constant time. |
+| **Remove Front/Back**| `removeFirst()` / `removeLast()`| **O(1)** | Direct array head/tail manipulation. |
+| **Peek** | `peekFirst()` / `peekLast()` | **O(1)** | Direct access. |
 
 ## 3. Set
 A **Set** is a `Collection` that cannot contain duplicate elements. It models the mathematical set abstraction.
 
 ### 1. HashSet
 The standard implementation of a set, backed by a `HashMap`.
+
+Key Characteristics
 - **Uniqueness**: Ensures no duplicates.
 - **Ordering**: No guarantee of iteration order; it can change over time.
-- **Performance**: Offers constant time $O(1)$ performance for basic operations (`add`, `remove`, `contains`).
+- **Nulls**: Allows one `null` element.
+
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Add** | `add(e)` | **O(1)** | Based on `HashMap.put()` logic. |
+| **Remove** | `remove(o)` | **O(1)** | Based on `HashMap.remove()` logic. |
+| **Contains** | `contains(o)` | **O(1)** | Hash-based lookup. |
 
 ### 2. LinkedHashSet
 Hash table and linked list implementation of the `Set` interface.
+
+Key Features
 - **Ordering**: Maintains a **doubly-linked list** across all entries, preserving **insertion order**.
-- **Performance**: Slightly slower than `HashSet` due to the overhead of maintaining the linked list, but still $O(1)$.
+- **Predictable Iteration**: Unlike `HashSet`, iteration order is consistent.
+
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Add/Remove** | `add()`, `remove()` | **O(1)** | Slightly slower than `HashSet` due to linked list maintenance. |
+| **Contains** | `contains()` | **O(1)** | Hash-based lookup. |
 
 ### 3. TreeSet
 A `NavigableSet` implementation backed by a `TreeMap`.
+
+Key Characteristics
 - **Ordering**: Elements are sorted according to their **natural ordering** or a custom `Comparator`.
-- **Performance**: $O(\log n)$ for basic operations.
+- **Navigation**: Provides methods to find closest matches (e.g., `ceiling`, `floor`).
+
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Add/Remove** | `add()`, `remove()` | **O(log n)** | Balanced Red-Black tree structure. |
+| **Contains** | `contains()` | **O(log n)** | Tree traversal. |
+
+---
 
 ## 4. Map (Related Hierarchy)
-While not extending the `Collection` interface, **Map** is a core part of the framework. It maps unique keys to values.
+Maps unique keys to values. Not a true `Collection` but part of the framework.
 
 ### 1. HashMap
-- **Storage**: Key-value pairs.
+The most commonly used `Map` implementation.
+
+Key Characteristics
+- **Storage**: Array of buckets (nodes).
 - **Nulls**: Allows one `null` key and multiple `null` values.
-- **Ordering**: No guarantee of order.
+- **Performance**: Treeification (Java 8+) converts long lists to trees in buckets.
+
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Put/Get** | `put()`, `get()` | **O(1) / O(log n)** | Average constant time; logarithmic in worst-case (collisions).|
+| **Remove** | `remove()` | **O(1)** | Hash-based lookup and removal. |
 
 ### 2. LinkedHashMap
-- **Ordering**: Maintains **insertion order**.
+Extends `HashMap` with linked list capabilities.
+
+Key Features
+- **Ordering**: Maintains **insertion order** or **access order** (LRU cache capability).
+- **Iteration**: Iterates in the order elements were added.
+
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Put/Get** | `put()`, `get()` | **O(1)** | Constant time with slightly more overhead than `HashMap`. |
 
 ### 3. TreeMap
-- **Ordering**: Maintains **sorted order** of keys.
-- **Hierarchy**: Implements `NavigableMap`, which extends `SortedMap`.
+A implementation of `NavigableMap` (which extends `SortedMap`) based on a Red-Black tree.
 
-### 4. SortedMap (Interface)
-A `Map` that further provides a total ordering on its keys.
-- **Key Methods**: `firstKey()`, `lastKey()`, `headMap(toKey)`, `tailMap(fromKey)`.
+Key Characteristics
+- **Ordering**: Maintains **sorted order** of keys (natural or comparator).
+- **SortedMap Interface**: Provides methods like `firstKey()`, `lastKey()`, `headMap()`, `tailMap()`.
+- **NavigableMap Interface**: Provides `lowerEntry()`, `floorKey()`, `ceilingKey()`, `higherEntry()`.
 
-### 5. NavigableMap (Interface)
-A `SortedMap` extended with navigation methods reporting closest matches for given search targets.
-- **Key Methods**: `lowerEntry(key)`, `floorEntry(key)`, `ceilingEntry(key)`, `higherEntry(key)`, `descendingMap()`.
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Put/Get** | `put()`, `get()` | **O(log n)** | Balanced Red-Black tree traversal. |
+| **Range Queries**| `subMap()`, `headMap()`| **O(log n)** | Efficient tree-based range finding. |
+| **First/Last** | `firstKey()`, `lastKey()`| **O(log n)** | Finding extremes in a tree. |
 
-### 6. ConcurrentHashMap
-A highly concurrent, thread-safe implementation of the `Map` interface.
-- **Mechanism**: Uses fine-grained locking (buckets/stripes) and CAS operations instead of locking the entire map.
-- **Performance**: Significantly faster than `Hashtable` in multi-threaded environments.
-- **Nulls**: Does **not** allow `null` keys or `null` values.
+### 4. ConcurrentHashMap
+A high-concurrency, thread-safe implementation.
 
-### 7. Hashtable
-- **Legacy**: Synchronized and does not allow `null` keys or values. Generally replaced by `HashMap` or `ConcurrentHashMap`.
+Key Features
+- **Mechanism**: Fine-grained locking and CAS operations.
+- **Nulls**: Does **not** allow `null` keys or values.
+
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Put/Get** | `put()`, `get()` | **O(1)** | Concurrent access with minimal blocking. |
+
+### 5. Hashtable (Legacy)
+A synchronized, legacy implementation.
+
+Key Characteristics
+- **Thread Safety**: Synchronizes every method (locking the whole map).
+- **Legacy**: Generally replaced by `HashMap` or `ConcurrentHashMap`.
+
+| Operation | Method | Time Complexity | Why? |
+| --- | --- | --- | --- |
+| **Put/Get** | `put()`, `get()` | **O(1)** | Fast but suffers high contention in multi-threaded apps. |
