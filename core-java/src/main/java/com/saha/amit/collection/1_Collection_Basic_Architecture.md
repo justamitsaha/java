@@ -29,6 +29,18 @@ It allows you to maintain the insertion order of elements and supports the inclu
 - `size()`: Returns the number of elements in the list.
 - `listIterator()` : Returns a  ListIterator  to traverse the list in both directions.
 
+
+
+| Feature | ArrayList | LinkedList | Vector | Stack |
+| --- | --- | --- | --- | --- |
+| **Data Structure** | Dynamic Array | Doubly Linked List | Dynamic Array | Dynamic Array |
+| **Thread Safety** | No | No | Yes | Yes |
+| **Ordering** | Insertion Order | Insertion Order | Insertion Order | LIFO |
+| **Performance (Access)** | **O(1)** | **O(n)** | **O(1)** | **O(1)** (Top) |
+| **Performance (Add/Remove)** | **O(n)** (avg) | **O(1)** (at ends) | **O(n)** (avg) | **O(1)** (at top) |
+| **Memory Overhead** | Low | High (Node pointers) | Low | Low |
+| **Main Use Case** | Fast lookups / Search | Frequent add/remove at ends | Legacy thread-safe apps | LIFO stack logic |
+
 ### 1. ArrayList
 An **ArrayList** in Java is a resizable, dynamic array found in the `java.util` package. Unlike standard arrays that have a fixed size, an `ArrayList` automatically grows or shrinks as you add or remove elements.
 
@@ -142,10 +154,21 @@ A linear data structure following the **Last-In, First-Out (LIFO)** principle. I
 | **Pop/Peek** | `pop()` / `peek()` | **O(1)** | Accesses the last element. |
 | **Search** | `search(o)` | **O(n)** | Traverses to find the object. |
 
+
 ---
 
 ## 2. Queue
 A collection designed for holding elements prior to processing.
+
+
+| Feature | PriorityQueue | ArrayDeque | LinkedList (as Queue) |
+| --- | --- | --- | --- |
+| **Ordering** | Priority-based (Heap) | FIFO (Insertion order) | FIFO (Insertion order) |
+| **Null Elements** | Not Allowed | Not Allowed | Allowed |
+| **Thread Safety** | No | No | No |
+| **Random Access** | No | No | Yes (Slow - O(n)) |
+| **Performance (Add/Poll)** | **O(log n)** | **O(1)** | **O(1)** |
+| **Main Use Case** | Priority tasks / Scheduling | Stacks and FIFO Queues | Queue with null support |
 
 ### 1. PriorityQueue
 An unbounded queue based on a **priority heap**.
@@ -169,6 +192,32 @@ An unbounded queue based on a **priority heap**.
 | **Poll/Remove** | `poll()` | **O(log n)** | Requires heap "sift-down" after removal. |
 | **Peek** | `peek()` | **O(1)** | Head of the heap is always at the root. |
 
+For a priority queue to sort elements correctly, the objects **must either implement `Comparable` or you must provide a `Comparator`** when constructing the `PriorityQueue`. This ensures that the queue can determine the correct ordering of elements based on their priority. Otherwise, you will encounter a `ClassCastException` at runtime when trying to add elements that cannot be compared.
+
+```java
+    record Employee(
+            int id,
+            String name,
+            String dept,
+            int age,
+            double salary) {
+    }
+
+    public static void main(String[] args) {
+        PriorityQueue<Employee> employeeQueue = new PriorityQueue<>(Comparator.comparingInt(Employee::age).reversed());
+        employeeQueue.add(new Employee(101, "Amit", "IT", 25, 50000));
+        employeeQueue.add(new Employee(102, "Rahul", "HR", 30, 64000));
+        employeeQueue.add(new Employee(103, "Neha", "IT", 27, 55000));
+    
+        System.out.println(employeeQueue.peek());
+        //This while loop works because poll gives top element and removes it from the queue, 
+        // so next time peek will give next top element and so on until the queue is empty.
+        while (!employeeQueue.isEmpty()) {
+            System.out.println(employeeQueue.poll());
+        }
+        System.out.println(employeeQueue);
+    } 
+```
 ---
 
 ### 2. ArrayDeque (Deque)
@@ -182,8 +231,10 @@ A resizable-array implementation of the `Deque` interface.
 - **When NOT to Use**: When you need to store `null` elements or require index-based access.
 - **Example Anti-pattern**: Using it as a list where you need to get an element at index 5.
 
+
+
 **Key Features**
--   **Double-Ended**: Efficient insertion and removal from both ends.
+-   **Double-Ended**: Efficient insertion and removal from both ends
 -   **No Nulls**: Prohibits `null` elements.
 -   **Performance**: Usually faster than `Stack` and `LinkedList`.
 
@@ -193,10 +244,62 @@ A resizable-array implementation of the `Deque` interface.
 | **Remove Front/Back**| `removeFirst()` / `removeLast()`| **O(1)** | Direct array head/tail manipulation. |
 | **Peek** | `peekFirst()` / `peekLast()` | **O(1)** | Direct access. |
 
+**ArrayDeque vs LinkedList** ArrayDeque is generally faster than `LinkedList` for queue operations because it uses a contiguous array, which benefits from better cache locality. However, it does not support null elements and does not provide index-based access, so it is not suitable for all use cases.
+
+| Feature | ArrayDeque              | LinkedList             |
+| --- |-------------------------|------------------------|
+| **Internal Data** | Resizable Array         | Doubly Linked List     |
+| **Null Elements** | Not allowed             | Allowed                |
+| **Cache Friendly** | Yes (Sequential memory) | No (Random pointers)   |
+| **Memory Usage** | Lower (No pointers)     | Higher (Node overhead) |
+| **Worst-case Add** | 0(n) (when resizing)    | O(1)(always)           |
+| **Performance** | Generally faster        | Slower for most tasks  |
+
+In summary, `ArrayDeque` is a more efficient choice for most queue and stack implementations, while `LinkedList` may be preferred when you need to store nulls or require list-like behavior with index access. 
+
+**ArrayDeque vs ArrayList** `ArrayDeque` is optimized for queue and stack operations, while `ArrayList` is optimized for random access. If you need to frequently add/remove elements from the front or back, `ArrayDeque` is more efficient. However, if you need to access elements by index, `ArrayList` is the better choice.
+
+You should use **`ArrayDeque`** instead of `ArrayList` when you specifically need a **Queue** (FIFO) or a **Deque** (Double-Ended Queue) because `ArrayList` is highly inefficient at removing elements from the front.
+
+**The Core Flaw of ArrayList for Queues**
+
+When you remove the first element from an `ArrayList`, every single remaining element must be shifted one position to the left in memory. 
+
+-   **`ArrayList.remove(0)`** takes **O(n)time**. If your list has 1,000,000 elements, removing the first item requires 999,999 memory shifts.
+-   **`ArrayDeque.removeFirst()`** takes **O(1)time**. It uses a circular array design, meaning it simply moves a pointer to the next element without moving any data. 
+
+**When to Choose Which**
+
+**Use ArrayDeque When:**
+
+-   You need a **Queue** (First-In, First-Out).
+-   You need a **Stack** (Last-In, First-Out).
+-   You need a **Deque** (Adding/removing from both ends).
+-   You **do not** need to look up items by an index (like `get(5)`). 
+
+**Use ArrayList When:** 
+
+-   You need a **List** (ordered collection).
+-   You need instant **random access** via index (e.g., `list.get(500)` in O(1) time).
+-   You only ever add or remove items from the **very end** of the structure (`add()` or `remove(list.size() - 1)`).
+
+**How ArrayDeque Avoids Shifting (Circular Array)**
+Think of an `ArrayDeque` as a ring. If you remove the item at index 0, the "head" pointer simply moves to index 1. The memory stays exactly where it is. `ArrayList` cannot do this because it forces index 0 to always be the start of the list.
+
+
 ---
 
 ## 3. Set
 A **Set** is a `Collection` that cannot contain duplicate elements.
+
+
+| Feature | HashSet | LinkedHashSet | TreeSet |
+| --- | --- | --- | --- |
+| **Ordering** | None | Insertion Order | Sorted Order (Natural or Comparator) |
+| **Null Elements** | Allowed (One) | Allowed (One) | Not Allowed |
+| **Performance (Add/Contains)** | **O(1)** | **O(1)** | **O(log n)** |
+| **Underlying Map** | HashMap | LinkedHashMap | TreeMap |
+| **Main Use Case** | High-performance uniqueness | Unique items with insertion order | Unique items in sorted order |
 
 ### 1. HashSet
 The standard implementation of a set, backed by a `HashMap`.
@@ -220,6 +323,47 @@ The standard implementation of a set, backed by a `HashMap`.
 | **Remove** | `remove(o)` | **O(1)** | Based on `HashMap.remove()` logic. |
 | **Contains** | `contains(o)` | **O(1)** | Hash-based lookup. |
 
+
+Set uses the `hashCode()` and `equals()` methods to determine uniqueness. For e.g. in below code snippet, we have two `Student` objects with the same `id` and `marks`, but since we haven't overridden `hashCode()` and `equals()`, they are treated as different objects and both will be added to the `HashSet`. If we want to consider them as duplicates based on their content, we would need to override these methods accordingly.
+
+But since `Employee` is a record, it automatically provides implementations of `hashCode()` and `equals()` based on its fields. Therefore, when we add two `Employee` records with the same field values to a `HashSet`, only one will be stored, as they are considered equal. In contrast, the `Student` class does not override these methods, so each instance is treated as unique regardless of its content, allowing duplicates in the `HashSet`.
+```java
+    static class Student{
+    int id;
+    int marks;
+
+    Student(int id, int marks){
+        this.id = id;
+        this.marks = marks;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{id=" + id + ", marks=" + marks + '}';
+    }
+}
+record Employee(
+        int id,
+        String name,
+        String dept,
+        int age,
+        double salary) {
+}
+public static void main(String[] args) {
+    Set<Employee> employeeSet = new HashSet<>();
+    employeeSet.add(new Employee(101, "Amit", "IT", 55, 50000));
+    employeeSet.add(new Employee(101, "Amit", "IT", 55, 50000));
+    employeeSet.add(new Employee(102, "Rahul", "HR", 30, 64000));
+    employeeSet.add(new Employee(103, "Neha", "IT", 27, 55000));
+    System.out.println(employeeSet);
+
+    Set<Student> students = new HashSet<>();
+    students.add(new Student(1, 90));
+    students.add(new Student(1, 90));
+    students.add(new Student(2, 85));
+    System.out.println(students);
+}
+```
 ---
 
 ### 2. LinkedHashSet
@@ -264,10 +408,21 @@ A `NavigableSet` implementation backed by a `TreeMap`.
 | **Add/Remove** | `add()`, `remove()` | **O(log n)** | Balanced Red-Black tree structure. |
 | **Contains** | `contains()` | **O(log n)** | Tree traversal. |
 
+
+
 ---
 
 ## 4. Map (Related Hierarchy)
 Maps unique keys to values.
+
+
+| Feature | HashMap | LinkedHashMap | TreeMap | ConcurrentHashMap | Hashtable (Legacy) |
+| --- | --- | --- | --- | --- | --- |
+| **Ordering** | None | Insertion/Access | Sorted Order (Keys) | None | None |
+| **Thread Safety** | No | No | No | Yes (Fine-grained) | Yes (Global lock) |
+| **Null Keys/Values** | Allowed | Allowed | Not Allowed | Not Allowed | Not Allowed |
+| **Performance (Put/Get)** | **O(1) / O(log n)** | **O(1)** | **O(log n)** | **O(1)** | **O(1)** |
+| **Main Use Case** | General purpose lookup | LRU Cache / Order | Range queries | High concurrency | Legacy code only |
 
 ### 1. HashMap
 The most commonly used `Map` implementation.
@@ -377,3 +532,5 @@ A synchronized, legacy implementation.
 | Operation | Method | Time Complexity | Why? |
 | --- | --- | --- | --- |
 | **Put/Get** | `put()`, `get()` | **O(1)** | Fast but suffers high contention in multi-threaded apps. |
+
+

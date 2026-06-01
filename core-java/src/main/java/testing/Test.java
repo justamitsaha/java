@@ -9,37 +9,6 @@ import java.util.stream.Stream;
 
 public class Test {
 
-
-    public static void main(String[] args) {
-        System.out.println(numbers.indexOf(3));;
-
-    }
-
-    private static Map<Integer, Integer> frequencyMap(List<Integer> list) {
-        if (null == list || list.isEmpty())
-            throw new IllegalArgumentException();
-        Map<Integer, Integer> map = new HashMap<>();
-        for (Integer i : list)
-            if (null != map.putIfAbsent(i, 1)) {
-                var count = map.get(i) + 1;
-                map.put(i, count);
-            }
-        return map;
-    }
-
-    private static void toBinary(){
-        String b = "101101";
-        System.out.println(Integer.parseInt(b,2));
-    }
-
-    record Employee(
-            int id,
-            String name,
-            String dept,
-            int age,
-            double salary) {
-    }
-
     record Product(
             int id,
             String name,
@@ -81,4 +50,41 @@ public class Test {
             1);
 
     static List<Integer> smallList = new ArrayList<>(List.of(1, 2, 3, 4, 5, 1));
+
+    static class Student{
+        int id;
+        int marks;
+
+        Student(int id, int marks){
+            this.id = id;
+            this.marks = marks;
+        }
+
+        @Override
+        public String toString() {
+            return "Student{id=" + id + ", marks=" + marks + '}';
+        }
+    }
+    record Employee(
+            int id,
+            String name,
+            String dept,
+            int age,
+            double salary) {
+    }
+    public static void main(String[] args) {
+        Set<Employee> employeeSet = new LinkedHashSet<>();
+        employeeSet.add(new Employee(101, "Amit", "IT", 55, 50000));
+        employeeSet.add(new Employee(101, "Amit", "IT", 55, 50000));
+        employeeSet.add(new Employee(102, "Rahul", "HR", 30, 64000));
+        employeeSet.add(new Employee(103, "Neha", "IT", 27, 55000));
+        System.out.println(employeeSet);
+
+        Set<Student> students = new LinkedHashSet<>();
+        students.add(new Student(1, 90));
+        students.add(new Student(1, 90));
+        students.add(new Student(2, 85));
+        System.out.println(students);
+    }
+
 }

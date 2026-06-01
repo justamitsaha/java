@@ -1,49 +1,51 @@
 
 
-##  1.What is decimal?
+### 1. What is decimal?
 Base of 10 e.g. 274 = 2x10^2 + 7x10^1 + 4x10^0 = 200+70=4
 ### 2. What  is Binary?
 Base of 2 e.g. 101 = 1x2^2 + 0x2^1+ 1x2^0= 4+0+1 =5
 
-```java
-
-public static void main(String[] args) {
-  String s = "1001101";
-  int value = Integer.parseInt(s, 2);
-  System.out.println(value);
-
-  int val2 = 0;
-  char[] c = s.toCharArray();
-  for (int i = 0; i < c.length; i++)
-    val2 = val2 + Integer.parseInt(String.valueOf(c[i])) * (int) Math.pow(2, c.length - (i + 1));
-  System.out.println(val2);
-
-  // Optimized manual approach (Horner's Method)
-  val2 = 0;
-  // Iterate through each character of the binary string
-  for (int i = 0; i < s.length(); i++) {
-    // Get the ASCII numeric value of the current bit ('0' or '1') which will be either 48 or 49
-    // when we subtract '0' we remove ASCII 40 leaving us with 0 or 1
-    int bit = s.charAt(i) - '0';
-    // Horner's Method: Multiply current result by base (2) and add next digit
-    val2 = (val2 * 2) + bit;
-  }
-  System.out.println(val2);
-}
-```  
 ### 3. Conversion between decimal and binary
 - Binary to decimal 101 = 1x2^2 + 0x2^1+ 1x2^0= 4+0+1 =5
+  ```java
+  public static void main(String[] args) {
+    String s = "1001101";
+    int value = Integer.parseInt(s, 2);
+    System.out.println(value);
+  
+    int val2 = 0;
+    char[] c = s.toCharArray();
+    for (int i = 0; i < c.length; i++)
+      val2 = val2 + Integer.parseInt(String.valueOf(c[i])) * (int) Math.pow(2, c.length - (i + 1));
+    System.out.println(val2);
+  
+    // Optimized manual approach (Horner's Method)
+    val2 = 0;
+    // Iterate through each character of the binary string
+    for (int i = 0; i < s.length(); i++) {
+      // Get the ASCII numeric value of the current bit ('0' or '1') which will be either 48 or 49
+      // when we subtract '0' we remove ASCII 40 leaving us with 0 or 1
+      int bit = s.charAt(i) - '0';
+      // Horner's Method: Multiply current result by base (2) and add next digit
+      val2 = (val2 * 2) + bit;
+    }
+    System.out.println(val2);
+  }
+  ```  
 - Decimal to binary
+ 
+  | Number  |   Divided by| Remainder |
+  |---|--|--|
+  | 354  | 2 |  0 |
+  | 177  | 2 |  1 |
+  | 88   | 2 |  0 |
+  | 44   | 2 |  0 |
+  | 22   | 2 |  0 |
+  | 11   | 2 |  1 |
+  | 5    | 2 |  1 |
+  | 2    | 2 |  0 |
+  | 1    |  |  |
 
-  354 /2 -> 0    
-  177 /2 -> 1    
-  88  /2 -> 0    
-  44  /2 -> 0    
-  22  /2 -> 0    
-  11  /2 -> 1    
-  5   /2 -> 1    
-  2   /2 -> 0    
-  1    
   Answer 10110010
 
 ```java  
@@ -70,10 +72,12 @@ public static void decimalToBinary(int n) {
 ```  
 ### 4. Binary addition
 
-carry        11    
-Num 1       101     (5)    
-Num 2       111     (7) 
-Solution   1100     (12)
+|              |      |
+|--------------|------|
+| carry        | 0011 |
+| Num 1 (5)    | 0101 |
+| Num 2 (7)    | 0111 |
+| Solution(12) | 1100 |
 
 ### 5. Binary Subtraction
 - Let's say we want to subtract 12-7, 12 = 1100, and 7 = 111
@@ -84,11 +88,12 @@ Solution   1100     (12)
 - So, for 2's compliment of 7 111...111000 will be added with 1 making it 111...111001
 - So, 12 -7 becomes
 
-  000...0001101 (12)
 
-  111...1111001 (-7)
-
-  000...0000110 (5)
+  |   |   |
+  |---|---|
+  |Number-1 12   |000...0001101|
+  |2's complement of 7 |111...1111001|
+  | Solution 5 | 000...0000110|
 
 ### 6. Bitwise operator
 

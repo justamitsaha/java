@@ -505,7 +505,7 @@ public class SortingDemo {
 ```
 Output
 
-### 💡 Modern Java Pro-Tips for Interviews
+### 4. Modern Java Pro-Tips for Interviews 💡
 
 1.  **Avoid Raw Math Subtraction Traps:** A classic, old-school shortcut for sorting integers or doubles was `this.id - other.id`. **Never do this.** If `this.id` is a massive positive integer and `other.id` is a massive negative integer, the subtraction can overflow/underflow the 32-bit integer boundaries, flipping the sign and breaking your sorting algorithm. Always use `Integer.compare()` or `Double.compare()`.
 
@@ -515,6 +515,65 @@ Output
 employees.sort(Comparator.comparing(Employee::getName)
                          .thenComparingDouble(Employee::getSalary));
 ```
+
+### 5. Practical Implementation: `CompareSortCollection.java`
+
+This example demonstrates how to use `Comparable` for natural ordering (rating) and `Comparator` for custom ordering (earnings).
+
+```java
+    static class Movies implements Comparable<Movies> {
+        String id;
+        String name;
+        int earnings;
+        float rating;
+
+        public Movies(String id, String name, int earnings, float rating) {
+            this.id = id;
+            this.name = name;
+            this.earnings = earnings;
+            this.rating = rating;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + id + "." + name + ", rating='" + rating + ", earnings='" + earnings + "}/\n";
+        }
+
+
+        @Override
+        public int compareTo(Movies o) {
+            return Float.compare(this.rating, o.rating);
+        }
+    }
+
+
+    public static void main(String[] args) {
+        var movies = generateMoviesList();
+        System.out.println("Unsorted Movie List->\n" + movies);
+        Collections.sort(movies);
+        System.out.println("Sorted movie list based on rating->\n" + movies);
+        Collections.sort(movies, new EarningComparator());
+        System.out.println("Sorted movie list based on earning->\n" + movies);
+    }
+
+    public static List<Movies> generateMoviesList() {
+        List<Movies> moviesList = new ArrayList<>();
+        moviesList.add(new Movies("1", "No Country for old men", 300_000, 9.3f));
+        moviesList.add(new Movies("2", "Shawshank redemption", 30_000, 9.8f));
+        moviesList.add(new Movies("3", "Transformer", 30_000_000, 4.8f));
+        moviesList.add(new Movies("4", "Avatar", 300_000_000, 6.8f));
+        return moviesList;
+    }
+    
+    static class EarningComparator implements Comparator<Movies> {
+    
+        @Override
+        public int compare(Movies o1, Movies o2) {
+            return o1.earnings - o2.earnings;
+        }
+    }
+```
+
 ```
 <FollowUp label="Want to look at TreeMap or PriorityQueue under the hood next?" query="Explain how TreeMap or PriorityQueue work internally in Java collections."/>                         
 ```

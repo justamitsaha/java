@@ -42,4 +42,25 @@ This will remove from index 1
                 smallList = new ArrayList<>(List.of(1, 2, 3, 4, 5, 1));
                 smallList.remove(Integer.valueOf(1));
 ```
-This will remove value 1 but only the 1st one                
+This will remove value 1 but only the 1st one
+
+### 🔹 4. What will be the output of below code? Will it print 3 employees or 2 employees?
+```java
+record Employee(
+        int id,
+        String name,
+        String dept,
+        int age,
+        double salary) {
+}
+public static void main(String[] args) {
+    Set<Employee> employeeSet = new HashSet<>();
+    employeeSet.add(new Employee(101, "Amit", "IT", 55, 50000));
+    employeeSet.add(new Employee(101, "Amit", "IT", 55, 50000));
+    employeeSet.add(new Employee(102, "Rahul", "HR", 30, 64000));
+    employeeSet.add(new Employee(103, "Neha", "IT", 27, 55000));
+    System.out.println(employeeSet);
+}
+```
+
+**Answer:** It will print 2 employees because record class has implemented equals and hashcode method based on all the fields. So when we try to add the same employee again it will not be added to the set as it is already present.

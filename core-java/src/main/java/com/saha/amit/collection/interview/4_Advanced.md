@@ -121,3 +121,43 @@ By moving the entire sub-list as a single unified chain, Java preserves node exe
 -   **If a bucket contains a `TreeNode` tree:** Resizing splits the tree into two separate sub-trees. If a resulting sub-tree winds up containing **6 or fewer nodes** (`UNTREEIFY_THRESHOLD`), the map collapses the complex tree structure back down into a standard, memory-saving `Node` linked list.
 
 ![img.png](img.png)
+
+## 2. Sequenced Collections (Java 21)
+
+Java 21 introduced **Sequenced Collections**, a new set of interfaces that provide a uniform way to access elements in a collection with a defined encounter order (first, last, and reversed).
+
+### **Key Interfaces**
+- **SequencedCollection**: Adds `addFirst()`, `addLast()`, `getFirst()`, `getLast()`, `removeFirst()`, `removeLast()`, and `reversed()`.
+- **SequencedSet**: A SequencedCollection that is also a Set (e.g., `LinkedHashSet`).
+- **SequencedMap**: A Map with sequenced keys/entries (e.g., `LinkedHashMap`).
+
+### **Practical Example: `SequenceTest.java`**
+This example demonstrates the new `SequencedMap` API available in Java 21+.
+
+```java
+import java.util.LinkedHashMap;
+import java.util.SequencedMap;
+
+public class SequenceTest {
+    public static void main(String[] args) {
+        SequencedMap<Integer, String> map = new LinkedHashMap<>();
+
+        for (int i = 0; i < 5; i++) {
+            map.put(i, "hello" + i);
+        }
+
+        // Accessing order-related entries
+        System.out.println("First Entry: " + map.firstEntry());
+        System.out.println("Last Entry: " + map.lastEntry());
+
+        // Reversing the view without copying the map
+        System.out.println("Reversed View: " + map.reversed());
+
+        // Polling (removing) from ends
+        System.out.println("Polled First: " + map.pollFirstEntry());
+        System.out.println("Polled Last: " + map.pollLastEntry());
+    }
+}
+```
+
+**Why it matters?** Before Java 21, getting the last element of a `LinkedHashSet` or `LinkedHashMap` was unnecessarily complex (requiring iterators or converting to an array). Sequenced collections provide a first-class, efficient way to handle ordered collections.

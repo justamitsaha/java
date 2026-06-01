@@ -87,7 +87,17 @@ Solution: We need to find a mask where all bits are 1 and the ith bit is zero li
 | 11011111 |
 | 10001011 |
 
-## 4. How many bits need to change, to change one number to another for e.g. 10100110 to 1001001
+## 4.How many bits need to change, to change one number to another for e.g. 10100110 to 1001001
 
 Solution: Do `XOR` and count the number of 1
+
+## 5.How many bits are 1 in a number for e.g. 10100110 or set bits in a number
+
+Solution: Keep shifting the number to right and check if last bit is 1 or not. If it is 1 then increment count do this until number becomes zero
+
+## 6. How many bits are present in a number for e.g. 10100110 or total bits in a number
+
+Solution : It is always `log2(n) + 1` where n is the number. 
+Same holds true for binary also in that case it is `log10(n) + 1` where n is the number in binary.
+We can also keep shifting the number to right and count the number of times we can shift until number becomes zero
 
