@@ -80,22 +80,51 @@ public static void decimalToBinary(int n) {
 | Solution(12) | 1100 |
 
 ### 5. Binary Subtraction
-- Let's say we want to subtract 12-7, 12 = 1100, and 7 = 111
-- There is no subtraction is binary 12-7 is 12 +(-7).
-- So what we have to do is that we have get the -ve value of 2nd operand  7 and add it with 1st operand
-- for getting binary of -7 we have to find 2's complement of 7 or 111 by switch all digit and add 1
-- When we say 7 is 111, it means  000...000111, zeros are the remaining digits of 32 bit int
-- So, for 2's compliment of 7 111...111000 will be added with 1 making it 111...111001
-- So, 12 -7 becomes
+**Binary subtraction is performed by adding the 2's complement of the subtrahend to the minuend.** In computer systems, direct subtraction does not happen; instead, 12 −7 is processed as 12 +(7)
+
+**Step 1**: Represent the Numbers in 32-Bit Binary. In a 32-bit integer system, any unused leading bits are filled with zeros.
+
+-   **12**: `00000000000000000000000000001100`
+-   **7**: `00000000000000000000000000000111`
+
+**Step 2**: Find the 1's Complement of 7. Invert all the bits of 7 (switch `0` to `1` and `1` to `0`):
+
+-   **1's Complement**: `11111111111111111111111111111000`
+
+**Step 3**: Find the 2's Complement (-7)
+
+Add `1` to the 1's complement to get the negative value:
+
+```text
+  11111111111111111111111111111000  (1's complement)
++                                1
+----------------------------------
+  11111111111111111111111111111001  (= -7 in binary)
+```
+
+**Step 4**: Add the 2's Complement to 12 Add the 32-bit binary representation of 12 and -7:
+
+```text
+   00000000000000000000000000001100  (12)
++  11111111111111111111111111111001  (-7)
+-----------------------------------
+(1)00000000000000000000000000000101  (Result)
+```
+
+**Step 5**: Discard the Carry Bit. The addition generates a 33rd carry bit `(1)` at the far left. Because we are using a fixed 32-bit system, this extra bit overflows and is discarded, leaving us with the final 32-bit result:
+
+-   **Final 32-Bit Solution**: `00000000000000000000000000000101` (which is **5** in decimal).
 
 
-  |   |   |
-  |---|---|
-  |Number-1 12   |000...0001101|
-  |2's complement of 7 |111...1111001|
-  | Solution 5 | 000...0000110|
 
 ### 6. Bitwise operator
+
+| Input A | Input B| AND (`&`) | OR (`\\|`) | XOR (`^`) |
+| --- | --- | --- | --- | --- | 
+| **0** | **0** | 0   | 0   | 0   | 
+| **0** | **1** | 0   | 1   | 1   | 
+| **1** | **0** | 0   | 1   | 1   | 
+| **1** | **1** | 1   | 1   | 0   | 
 
 - `&`: **AND** operator, when both operand 1, it will be 1 otherwise 0
 - `|`: **OR** operator, when either operand is 1, it will be 1 otherwise 0
@@ -103,6 +132,8 @@ public static void decimalToBinary(int n) {
 - `~`: **INVERSE** operator will reverse the bits e.g. 000...101 will become 111...010 also called 1's compliment
 - `>>`: **Right shift** operator 12>>2 means all bits will be shifted 2 times 000...1100 will become 000...0011(3)
 - `<<`: **LEFT shift** operator 12<<2 means all bits will be shifted 2 times 000...1100 will become 000...1100100(48)
+
+
 
 ### 7. Importance of Shift operators
 -   **<< (Left Shift):** Shifts bits left.  Effectively multiplies the number by 2
