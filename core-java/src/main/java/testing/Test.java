@@ -73,18 +73,13 @@ public class Test {
             double salary) {
     }
     public static void main(String[] args) {
-        Set<Employee> employeeSet = new LinkedHashSet<>();
-        employeeSet.add(new Employee(101, "Amit", "IT", 55, 50000));
-        employeeSet.add(new Employee(101, "Amit", "IT", 55, 50000));
-        employeeSet.add(new Employee(102, "Rahul", "HR", 30, 64000));
-        employeeSet.add(new Employee(103, "Neha", "IT", 27, 55000));
-        System.out.println(employeeSet);
+        List<Integer> lst = new ArrayList<Integer>();
+        lst.add(1);
+        System.out.println("Hi"+lst);
+    }
 
-        Set<Student> students = new LinkedHashSet<>();
-        students.add(new Student(1, 90));
-        students.add(new Student(1, 90));
-        students.add(new Student(2, 85));
-        System.out.println(students);
+    public static void test(List<Integer> lst){
+        lst.add(2);
     }
 
 }
